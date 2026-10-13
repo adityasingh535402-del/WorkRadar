@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>WorkRadar · AI Workflow</title>
+<link rel="stylesheet" href="doc.css">
+<style>
+  .flow { display: grid; grid-template-columns: repeat(6, 1fr); gap: 2mm; }
+  .flow .st { border: 0.3mm solid var(--line); border-radius: 2mm; padding: 2.2mm 2.4mm; background: #fff; }
+  .flow .st .k { font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 7.8pt; color: var(--teal); letter-spacing: .04em; text-transform: uppercase; }
+  .flow .st h3 { font-size: 9.2pt; margin: 0.6mm 0 1mm; }
+  .flow .st p { font-size: 7.6pt; margin: 0 0 1mm; color: var(--ink-2); }
+  .flow .st .who { font-size: 7.2pt; color: var(--ink-3); border-top: 0.25mm solid var(--line-2); padding-top: 1mm; margin-top: 1mm; }
+  .flow .st .who b { color: var(--ink); font-weight: 600; }
+  .arch { display: grid; grid-template-columns: 1fr 1.25fr 1.25fr 1fr; gap: 2.4mm; align-items: stretch; }
+  .arch .col { display: flex; flex-direction: column; gap: 1.8mm; }
+  .arch .lbl { font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 7.6pt; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); }
+  .box { border-radius: 1.8mm; padding: 1.8mm 2.2mm; font-size: 7.7pt; line-height: 1.3; border: 0.3mm solid var(--line); background: #fff; }
+  .box b { display: block; font-size: 8.4pt; font-weight: 600; margin-bottom: 0.3mm; }
+  .box.ai { border-color: #9fdccf; background: #effaf7; }
+  .box.ai b::after { content: ' · AI'; font-family: 'Barlow Condensed', sans-serif; color: var(--teal); font-size: 7.6pt; }
+  .box.det { background: var(--wash); border-color: var(--line-2); }
+  .box.dark { background: var(--scope); color: #cfe7e1; border-color: var(--scope); }
+  .box.dark b { color: #f2fbf8; }
+  .prompt { display: grid; grid-template-columns: 34mm 1fr; gap: 3mm; }
+  .prompt .meta h3 { font-size: 9.4pt; }
+  .prompt .meta p { font-size: 7.6pt; color: var(--ink-2); }
+  .gen td:first-child { font-weight: 600; width: 15%; }
+  .gen td:nth-child(2) { width: 27%; }
+  .to { font-family: 'Barlow Condensed', sans-serif; font-weight: 600; color: var(--teal); }
+  .fix { color: var(--ink); }
+  .fix::before { content: '→ '; color: var(--teal); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- ───────────────────────────── Page 1 ───────────────────────────── -->
+<section class="page">
+  <header class="mast">
+    <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+      <circle cx="16" cy="16" r="14" fill="none" stroke="#7ad6c4" stroke-opacity=".35" stroke-width="1.3"/>
+      <circle cx="16" cy="16" r="8.5" fill="none" stroke="#7ad6c4" stroke-opacity=".35" stroke-width="1.3"/>
+      <path d="M16 16 L16 2 A14 14 0 0 1 29.3 11.7 Z" fill="#5fe3c8" opacity=".35"/>
+      <circle cx="21.5" cy="9.5" r="2.4" fill="#f5a524"/>
+      <circle cx="24.5" cy="21" r="1.8" fill="#e5484d"/>
+      <circle cx="16" cy="16" r="1.6" fill="#5fe3c8"/>
+    </svg>
+    <div>
+      <div class="kicker">AI Workflow Document</div>
+      <h1>How WorkRadar was built with AI</h1>
+      <div class="sub">The tools, the prompts that mattered, what AI produced, what changed after review, and the trade-offs behind each decision.</div>
+    </div>
+    <div class="meta">
+      <b>Aditya Singh</b><br>
+      Airtribe · AI Product Management<br>
+      v1.0 · 13 October 2026
+    </div>
+  </header>
+
+  <div class="grid g-6-4">
+    <div>
+      <h2><span class="n">01</span>Overview</h2>
+      <p>AI shows up in WorkRadar in two layers, and the project treats them differently.</p>
+      <p><strong>AI inside the product.</strong> Google Gemini, orchestrated by n8n, writes the manager’s daily brief and triages Slack threads and emails, which have no priority or owner fields. It does <em>not</em> decide the ranking. A deterministic, explainable score does that, so every item can show why it is on the radar. Gemini runs under a JSON schema, its output is validated, and the app falls back to an on-device summary when no AI is reachable.</p>
+      <p><strong>AI used to build the product.</strong> Claude (Anthropic) was the build partner from brief to delivery. It framed the problem, drafted the PRD, set the visual direction, wrote the React app and the n8n workflows, built a validation harness, and generated the Figma file from the running app. I set the constraints and made the product calls: the Airtribe context, n8n as the workflow engine, self-hosting instead of n8n Cloud, Gemini as the model provider, and the deadline. Every AI output went through a review pass before it shipped.</p>
+    </div>
+    <div class="card dark">
+      <h3>At a glance</h3>
+      <div class="stats" style="grid-template-columns: 1fr 1fr; margin-top: 2mm; row-gap: 3mm">
+        <div class="stat"><div class="v">7</div><div class="l">AI and automation tools in the workflow</div></div>
+        <div class="stat"><div class="v">4</div><div class="l">n8n workflows: digest, ingestion, actions, morning brief</div></div>
+        <div class="stat"><div class="v">2</div><div class="l">production prompts, both schema-constrained</div></div>
+        <div class="stat"><div class="v">3</div><div class="l">AI engines in the fallback chain: n8n, serverless, on-device</div></div>
+        <div class="stat"><div class="v">15</div><div class="l">hi-fi screens generated from the live app</div></div>
+        <div class="stat"><div class="v">12</div><div class="l">changes made after reviewing AI output (section 06)</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <h2><span class="n">02</span>AI tools used</h2>
+    <table>
+      <thead><tr><th style="width:19%">Tool</th><th style="width:15%">Role</th><th style="width:40%">What it did</th><th>Why this tool</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Claude</strong> (Anthropic), agentic coding environment</td><td>Build partner</td><td>Problem framing, personas, PRD and this document; design direction; React + TypeScript app; scoring model; n8n workflow JSON and Code nodes; validation harness; README; DOM-to-Figma pipeline</td><td>Long-context reasoning across product, design and code. It can run, test and screenshot its own work.</td></tr>
+        <tr><td><strong>Google Gemini</strong> · Flash model, Flash-Lite fallback</td><td>In-product LLM</td><td>Writes the daily brief from a ranked snapshot. Triages unstructured Slack and email threads into priority, waiting-on-manager, blocked, summary, next step and suggested owner.</td><td>Native JSON-schema output (<code>responseSchema</code>), a free tier for the pilot, low latency</td></tr>
+        <tr><td><strong>n8n</strong> Community Edition, self-hosted in Docker</td><td>AI orchestration</td><td>Ingests the four sources every 15 min, normalises them, calls Gemini for triage, scores and ranks. Serves the digest and action webhooks, and posts the 08:45 Slack brief.</td><td>The assignment required n8n. Self-hosting is free; a Cloudflare tunnel exposes the webhooks.</td></tr>
+        <tr><td><strong>Vercel Edge Functions</strong></td><td>AI gateway</td><td><code>/api/digest</code> forwards to n8n when configured, otherwise calls Gemini directly. Keeps the API key server-side.</td><td>A free, keyless browser, and a working AI brief even when the laptop running n8n is off</td></tr>
+        <tr><td><strong>Figma MCP</strong> (Plugin API)</td><td>Design output</td><td>Rebuilt captured app states as editable Figma layers. A bundled plugin covers the remaining screens.</td><td>Design file and shipped product never drift</td></tr>
+        <tr><td><strong>Playwright</strong> (headless Chromium)</td><td>Capture and QA</td><td>Renders 15 app states for the DOM extractor and screenshots, visual review at desktop and mobile widths, HTML-to-PDF for these documents</td><td>Repeatable visual checks without manual clicking</td></tr>
+        <tr><td><strong>GitHub Actions</strong></td><td>Verification</td><td>Typecheck, production build and the n8n simulator on every push</td><td>Catches AI-introduced regressions automatically</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div>
+    <h2><span class="n">03</span>How the work flowed</h2>
+    <div class="flow">
+      <div class="st"><div class="k">1 · Frame</div><h3>Problem and users</h3><p>Turned the brief into four manager questions, two personas and six pain points.</p><div class="who"><b>AI:</b> drafts · <b>Me:</b> Airtribe context, scope</div></div>
+      <div class="st"><div class="k">2 · Decide</div><h3>Product calls</h3><p>Explainable ranking, AI for language only, three-engine fallback, mock data for the demo.</p><div class="who"><b>AI:</b> options and trade-offs · <b>Me:</b> chose</div></div>
+      <div class="st"><div class="k">3 · Design</div><h3>Visual direction</h3><p>“Air-traffic control”: radar scope hero, flight-strip rows, Barlow type, light and dark tokens.</p><div class="who"><b>AI:</b> direction and CSS · <b>Me:</b> approved</div></div>
+      <div class="st"><div class="k">4 · Build</div><h3>App and workflows</h3><p>React app, scoring, search parser, 4 n8n workflows, Vercel routes, 47 mock items relative to “now”.</p><div class="who"><b>AI:</b> code · <b>Me:</b> keys, Docker, repo</div></div>
+      <div class="st"><div class="k">5 · Verify</div><h3>Review loops</h3><p>Screenshot review against the PRD, an n8n simulator, CI, API route tests. 12 changes.</p><div class="who"><b>AI:</b> self-review · <b>Me:</b> acceptance</div></div>
+      <div class="st"><div class="k">6 · Ship</div><h3>Deliverables</h3><p>Figma from the live app, PRD, this document, README, deploy and n8n guides.</p><div class="who"><b>AI:</b> drafts · <b>Me:</b> final edit, demo</div></div>
+    </div>
+  </div>
+
+  <div class="foot"><span>WorkRadar AI Workflow · Aditya Singh · Concept project for the Airtribe AI PM program. Not affiliated with or endorsed by Airtribe.</span><span>1 / 4</span></div>
+</section>
+
+<!-- ───────────────────────────── Page 2 ───────────────────────────── -->
+<section class="page">
+  <div>
+    <h2><span class="n">04</span>Where AI runs inside the product</h2>
+    <div class="arch">
+      <div class="col">
+        <div class="lbl">Sources</div>
+        <div class="box det"><b>Slack</b>Threads, DMs, mentions. No priority field.</div>
+        <div class="box det"><b>Jira</b>Tickets with P-levels, sprints, links</div>
+        <div class="box det"><b>GitHub</b>PRs, reviews, checks</div>
+        <div class="box det"><b>Gmail</b>Escalations, stakeholder asks</div>
+      </div>
+      <div class="col">
+        <div class="lbl">n8n · Source ingestion (every 15 min)</div>
+        <div class="box det"><b>Normalise</b>4 payloads → one WorkItem shape (owner, due, links, blockers)</div>
+        <div class="box ai"><b>Triage unstructured threads</b>Gemini reads Slack and email and returns priority, waitingOnManager, blocked, escalation, summary, nextStep and suggestedOwner</div>
+        <div class="box det"><b>Score and rank</b>6 weighted signals → 0–100, P0 pinned ≥ 97, rings: now ≥ 75, today ≥ 50</div>
+      </div>
+      <div class="col">
+        <div class="lbl">Brief generation</div>
+        <div class="box ai"><b>n8n · Daily digest</b>The ranked snapshot (top 24 open, blocked people, last 24h) goes to Gemini with a JSON schema, then a validation step</div>
+        <div class="box"><b>Vercel /api/digest</b>Same prompt and schema when n8n is unreachable. Same-origin only, 80 KB cap, Flash-Lite retry on 429/404/503.</div>
+        <div class="box det"><b>On-device summary</b>A rule-based brief from the same snapshot, so the brief is never empty. The engine is always labelled.</div>
+      </div>
+      <div class="col">
+        <div class="lbl">Manager</div>
+        <div class="box dark"><b>WorkRadar app</b>Today, Priority feed, Item detail, Search, Team. Every score shows “why”.</div>
+        <div class="box"><b>Actions → n8n</b>Assign, Done and Snooze post to the action webhook (demo mode logs; live mode writes back)</div>
+        <div class="box ai"><b>08:45 Slack brief</b>An n8n cron job calls the items and digest webhooks and posts five lines to Slack</div>
+      </div>
+    </div>
+    <p class="small muted" style="margin-top:2mm">Green boxes use an LLM. Grey boxes are deterministic code. The split is deliberate: AI handles language and ambiguity, code handles ranking and anything that must be auditable.</p>
+  </div>
+
+  <div>
+    <h2><span class="n">05</span>Significant prompts</h2>
+    <div class="prompt card">
+      <div class="meta">
+        <h3>A · Daily brief</h3>
+        <p><strong>Where:</strong> n8n “Daily digest” and <code>api/_prompt.ts</code>, as one shared text</p>
+        <p><strong>Model:</strong> Gemini Flash, temperature 0.3, <code>responseMimeType: application/json</code> + <code>responseSchema</code></p>
+        <p><strong>Design choices:</strong> facts-only rule, exact IDs so output can be validated, sentence-length caps so it fits the UI, and a fixed shape for each of the five sections.</p>
+      </div>
+<pre>You are WorkRadar, a chief-of-staff assistant for an engineering manager.
+You receive a JSON snapshot of their team's work from Slack, Jira, GitHub and email.
+Items are already ranked by a transparent priority score (0-100) and grouped into rings:
+"now" (needs attention now), "today" and "later".
+Write the manager's brief as JSON that matches the response schema.
+
+Rules
+- Use only facts in the snapshot. Never invent people, numbers, deadlines or items.
+- Put the exact item "id" from the snapshot in every itemId field. Use team member ids for personId.
+- Plain, specific language. No hype, no emojis, no exclamation marks.
+- Each "why", "action" and "suggestion" is one sentence under 25 words.
+
+Fields
+- headline: 1-2 sentences. How many items need attention, how many people are blocked
+  (and how many on the manager), and the one thing to start with and why.
+- topWork: exactly 3 items the manager should personally act on today ... "why" is the concrete next step.
+- happened: up to 6 notable events from happenedToday as short past-tense sentences.
+- attention: every item in ring "now" (max 6), with why it matters now and the action to take.
+- blocked: one entry per blocked person with personId, itemId, blockedOn, since and suggestion.</pre>
+    </div>
+
+    <div class="prompt card" style="margin-top:2.6mm">
+      <div class="meta">
+        <h3>B · Thread triage</h3>
+        <p><strong>Where:</strong> n8n “Source ingestion”, Prepare AI triage → Gemini</p>
+        <p><strong>Model:</strong> Gemini Flash, temperature 0.2, schema with a <code>P0–P3 | NONE</code> enum and booleans. The results are merged into each item’s signals before scoring.</p>
+        <p><strong>Design choices:</strong> Airtribe-specific P-level definitions anchored on learners and revenue; the team roster plus skills, for owner suggestions; FYIs filtered out before the call to save tokens.</p>
+      </div>
+<pre>You triage workplace messages for Neha Kapoor, Engineering Manager of the Learning Platform team
+at Airtribe (an online learning company running live cohort programs).
+For every thread, return one object in "results" with:
+- priority: P0 (live incident hurting learners now), P1 (urgent, learners or revenue affected),
+  P2 (normal), P3 (low), or NONE for FYI
+- waitingOnManager: true only if someone is explicitly waiting for Neha to decide, review or reply
+- blocked: true if a teammate says they cannot proceed
+- escalation: true for incidents or escalations from leadership or customers
+- summary: one plain sentence under 30 words with the key facts (numbers, deadlines)
+- nextStep: one sentence under 25 words telling the manager what to do
+- suggestedOwner: the team member id best placed to own it, or "" if it is the manager's own decision
+Use only the facts in the text. Team: [{"id":"rahul","role":"Senior Frontend Engineer","skills":[...]}, ...]</pre>
+    </div>
+  </div>
+
+  <div class="foot"><span>Prompts are quoted from the repository (<code>api/_prompt.ts</code>, <code>n8n/src/ingest-classify-request.js</code>); “...” marks shortening.</span><span>2 / 4</span></div>
+</section>
+
+<!-- ───────────────────────────── Page 3 ───────────────────────────── -->
+<section class="page">
+  <div>
+    <h2><span class="n">05</span>Significant prompts, continued: directing the build</h2>
+    <div class="grid g2">
+      <div class="prompt card" style="grid-template-columns: 1fr">
+        <div class="meta"><h3>C · The project brief given to Claude <span class="muted small" style="font-family:Barlow;font-weight:400">(condensed)</span></h3><p>It set the deliverables and the quality bar. Its last line made Claude plan before building, which surfaced the questions that mattered: the author, the target company, the deadline, n8n hosting and Figma access.</p></div>
+<pre>Build WorkRadar, an AI-powered web app that helps managers see top work for the day, what happened today, what needs immediate attention and who is blocked, without checking Slack, Jira, GitHub or email.
+
+Deliverables: PRD (PDF, max 2 pages) · hi-fi UI designs (Dashboard, Priority Feed, Item Details, Search, Empty/Error state) · working MVP (dashboard, AI summary, priority feed, search, detail page, Assign / Mark Done / Snooze; mock data is fine) · AI workflow doc (tools, significant prompts, what AI generated, what was modified, trade-offs) · source code · demo video.
+
+Use n8n for workflows. I want a full-fledged, functioning, visually aesthetic project, so use your best judgement for the design tool. Before starting, prepare a list of tasks or things you need from me, and deliver the entire project with maximum value.</pre>
+      </div>
+      <div class="prompt card" style="grid-template-columns: 1fr">
+        <div class="meta"><h3>D · Framing and constraints <span class="muted small" style="font-family:Barlow;font-weight:400">(my reply, lightly edited)</span></h3><p>One reply reshaped the product. The Airtribe context gave the mock data its stakes: live classes, the GenAI Launchpad and mentor sessions. “No n8n Cloud” led to self-hosted n8n plus a serverless fallback.</p></div>
+<pre>1. Aditya Singh. Create this project for an Airtribe manager itself, for best impact, as this assignment is part of my AI product management course. Their website: airtribe.live
+2. The assignment is due on 16 Oct 2026.
+3. Give me the steps for the API setup for n8n with Gemini.
+4. I don't have an n8n Cloud subscription. Choose the next best alternative.
+5. I have connected GitHub with Claude, with an empty repo called workradar.
+6. Once the project is complete, ask me again (about the demo video).
+7. Yes, you can create a new file in my Figma drafts.</pre>
+        <p class="small muted" style="margin:1.6mm 0 0"><strong>How review worked in the build loop:</strong> each screen was screenshotted and reviewed from a sceptical manager’s point of view at 9 am, asking what is wrong, confusing or untrustworthy. Every number in the brief was checked against the snapshot.</p>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <h2><span class="n">06</span>What AI generated, and what changed after review</h2>
+    <table class="gen">
+      <thead><tr><th>Area</th><th>Generated by AI</th><th>Changed after review</th></tr></thead>
+      <tbody>
+        <tr><td>Ranking model</td><td>Six-signal weighted score, rings, “why” details per factor</td><td><span class="fix">The P0 iPhone incident ranked below a PR, so P0 is now pinned to ≥ 97.</span><br><span class="fix">Slack and email items read “No priority set”. They now read “Inferred P1”.</span></td></tr>
+        <tr><td>Brief copy</td><td>Prompt, schema, on-device brief, engine labels</td><td><span class="fix">Absolute clock times contradicted relative times (“in 5h”), so they were removed from AI copy.</span><br><span class="fix">“1 days” became “about a day”, and lowercase sentence starts were capitalised.</span><br><span class="fix">The engine label now says “Gemini via n8n” or “n8n (rule-based)”.</span></td></tr>
+        <tr><td>Validation</td><td>JSON schema output</td><td><span class="fix">Added <code>sanitizeBrief</code>: drops unknown item IDs, resolves names to people, caps list lengths, rejects briefs without a headline.</span></td></tr>
+        <tr><td>Priority feed</td><td>Flight-strip rows, views, filters, keyboard triage</td><td><span class="fix">The default view was too sparse, so it is now “All open” with ring headers.</span><br><span class="fix">Item refs were truncated, so columns were widened and DM refs shortened. Keyboard hints moved to their own line.</span></td></tr>
+        <tr><td>Empty and error states</td><td>First run, no results, outage banner, AI error with retry</td><td><span class="fix">On first run, source icons stretched and the sidebar claimed sources had synced “2m ago”. Fixed to “Not connected”.</span></td></tr>
+        <tr><td>n8n workflows</td><td>4 workflows as JSON, 9 Code-node sources, mock source payloads</td><td><span class="fix">The n8n docs weren’t reachable, so node versions and parameters were checked against n8n’s source (nodes-base 2.44). Added a simulator to CI that replays the whole pipeline.</span></td></tr>
+        <tr><td>Security</td><td>Server-side Gemini route</td><td><span class="fix">Added a same-origin check, an 80 KB payload cap, a 40-item cap and a model fallback. The key lives only in n8n credentials and Vercel env, never in code or chat.</span></td></tr>
+        <tr><td>Figma pipeline</td><td>DOM extractor and Figma renderer</td><td><span class="fix">Fixed text that truncated when it fit, missing underlines and percentage corner radii. Starter-plan limits led to a bundled plugin.</span></td></tr>
+      </tbody>
+    </table>
+    <p class="small muted" style="margin-top:1.6mm">Written by hand, not generated: the choice of problem and users, the Airtribe framing, all product scope decisions in the PRD, the n8n hosting decision, API keys and accounts, and final acceptance of each deliverable.</p>
+  </div>
+
+  <div class="card wash">
+    <h3>Prompting patterns that worked</h3>
+    <ul class="small cols2">
+      <li><strong>Ask for a plan and questions first.</strong> “Prepare a list of what you need from me” turned a vague brief into five concrete decisions before any code was written.</li>
+      <li><strong>Give the model the business definitions.</strong> P0–P3 anchored on learners and revenue made triage consistent with how Airtribe actually prioritises.</li>
+      <li><strong>Constrain output to the UI.</strong> Schema fields map one-to-one to UI slots, with word limits sized to the layout.</li>
+      <li><strong>Make hallucinations detectable.</strong> Requiring exact item IDs means any invented item can be dropped automatically.</li>
+      <li><strong>One prompt, many runtimes.</strong> The brief prompt lives in one file that n8n and Vercel both use, so the engines can’t drift.</li>
+      <li><strong>Review against screenshots, not code.</strong> Most quality issues (ranking surprises, copy, truncation) were only visible on the rendered screen.</li>
+    </ul>
+  </div>
+
+  <div class="foot"><span>WorkRadar AI Workflow · Aditya Singh</span><span>3 / 4</span></div>
+</section>
+
+<!-- ───────────────────────────── Page 4 ───────────────────────────── -->
+<section class="page">
+  <div>
+    <h2><span class="n">07</span>Key trade-offs</h2>
+    <table>
+      <thead><tr><th style="width:15%">Decision</th><th style="width:21%">Chosen</th><th style="width:20%">Instead of</th><th>Why, and what it costs</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Who ranks</strong></td><td>Deterministic weighted score; AI for language and triage</td><td>LLM ranks everything</td><td>Explainable, stable between refreshes, testable and free. It can’t pick up subtle context, so Gemini triage feeds it signals and the weights are adjustable.</td></tr>
+        <tr><td><strong>Output format</strong></td><td>JSON schema + validation</td><td>Free-text summary</td><td>Renders into specific UI slots, links to real items and can be checked for invented IDs. Costs some expressiveness, mitigated by tight per-field instructions.</td></tr>
+        <tr><td><strong>Orchestration</strong></td><td>Self-hosted n8n CE (Docker + Cloudflare tunnel)</td><td>n8n Cloud; plain backend code</td><td>Meets the n8n requirement at zero cost, and the workflows are visual for a PM audience. The tunnel URL changes and the laptop must be on, hence the next row.</td></tr>
+        <tr><td><strong>Availability</strong></td><td>n8n → Vercel Gemini → on-device chain</td><td>Single AI path</td><td>The brief is never empty and the engine is always labelled. Costs one prompt kept in two places, solved with a single shared prompt file.</td></tr>
+        <tr><td><strong>Model size</strong></td><td>Gemini Flash, with Flash-Lite on 429/404/503</td><td>Pro-class model</td><td>The brief summarises an already-ranked snapshot, so a fast model suffices. Lower latency, within the free tier. Nuance on long threads is weaker.</td></tr>
+        <tr><td><strong>Data sent to AI</strong></td><td>Top 24 open items + blocked people + last 24h</td><td>Every raw thread</td><td>Fewer tokens, less private content leaving the system, more focused output. Low-ranked items can’t appear in the brief, which is acceptable by design.</td></tr>
+        <tr><td><strong>Data</strong></td><td>Mock workspace with timestamps relative to “now”</td><td>Live OAuth connectors</td><td>Allowed by the brief. The demo always reads as “today” and is safe to share. Real-world noise and edge cases are untested until the pilot.</td></tr>
+        <tr><td><strong>Design file</strong></td><td>Generated from the running app (DOM → Figma)</td><td>Mockups drawn first</td><td>Design and code never drift, and 15 states came cheaply. Layers are absolutely positioned rather than auto-layout components.</td></tr>
+        <tr><td><strong>UI stack</strong></td><td>Hand-written CSS tokens, no UI library</td><td>Component library</td><td>A distinctive look, a small bundle (85 KB gzip JS) and full control of light and dark. More code to maintain; AI made it cheap to write.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid g2">
+    <div class="card wash">
+      <h3>Guardrails and how the AI is checked</h3>
+      <ul class="small">
+        <li><strong>Facts-only prompting</strong> with exact IDs, then <strong>validation</strong> that drops anything the snapshot can’t support.</li>
+        <li><strong>Every score is explained</strong> by factor in the UI, so the manager can disagree and re-weight.</li>
+        <li><strong>An engine label on every brief</strong> (Gemini, Gemini via n8n, n8n rule-based, on-device), so users know what they’re reading.</li>
+        <li><strong>The pipeline simulator</strong> (<code>n8n/validate.mjs</code>) replays ingestion → triage → score in CI. The expected top three are the iPhone incident (97), PR #1284 (93) and LP-512 (86).</li>
+        <li><strong>Graceful failure:</strong> the outage banner hides a down source and explains the effect on ranking. AI errors offer a retry or the on-device summary.</li>
+        <li><strong>Secrets</strong> stay only in n8n credentials and Vercel env. The browser never sees the key.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>What I’d do next with AI</h3>
+      <ul class="small">
+        <li><strong>An eval set:</strong> 50 golden snapshots with expected top-3 lists, plus an LLM-as-judge faithfulness check on every brief, tracked weekly.</li>
+        <li><strong>Learned weights:</strong> tune the six weights per manager from opens, snoozes and reorders, keeping the explanation.</li>
+        <li><strong>Reply drafts:</strong> Gemini drafts responses for “waiting on you” asks, sent only after the manager approves.</li>
+        <li><strong>Write-back</strong> through n8n: Jira assign, GitHub review requests and Slack replies, with an audit log and undo.</li>
+        <li><strong>Cost and latency dashboards</strong> from n8n execution data, with budget alerts per team.</li>
+        <li><strong>A privacy layer:</strong> redact personal data before triage, and keep message bodies for at most 7 days.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card dark small" style="display:grid;grid-template-columns:auto 1fr;gap:1.2mm 4mm">
+    <strong style="color:#f2fbf8">Lesson</strong><span>The most useful AI work wasn’t generating code. It was generating options and then critiquing the result from the user’s point of view. The biggest quality jumps came from review passes against real screenshots, not from longer build prompts.</span>
+    <strong style="color:#f2fbf8">Links</strong><span>Source and workflows: <a style="color:#5fe3c8" href="https://github.com/adityasingh535402-del/WorkRadar">github.com/adityasingh535402-del/WorkRadar</a> · Designs: <a style="color:#5fe3c8" href="https://www.figma.com/design/Q8RHXzIj6yOqBR4HDq5hn5">figma.com/design/Q8RHXzIj6yOqBR4HDq5hn5</a> · PRD: <code style="background:none;color:#cfe7e1">docs/WorkRadar-PRD.pdf</code></span>
+  </div>
+
+  <div class="foot"><span>WorkRadar AI Workflow · Aditya Singh</span><span>4 / 4</span></div>
+</section>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>WorkRadar · Product Requirements Document</title>
+<link rel="stylesheet" href="doc.css">
+</head>
+<body>
+
+<!-- ───────────────────────────── Page 1 ───────────────────────────── -->
+<section class="page">
+  <header class="mast">
+    <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+      <circle cx="16" cy="16" r="14" fill="none" stroke="#7ad6c4" stroke-opacity=".35" stroke-width="1.3"/>
+      <circle cx="16" cy="16" r="8.5" fill="none" stroke="#7ad6c4" stroke-opacity=".35" stroke-width="1.3"/>
+      <path d="M16 16 L16 2 A14 14 0 0 1 29.3 11.7 Z" fill="#5fe3c8" opacity=".35"/>
+      <circle cx="21.5" cy="9.5" r="2.4" fill="#f5a524"/>
+      <circle cx="24.5" cy="21" r="1.8" fill="#e5484d"/>
+      <circle cx="16" cy="16" r="1.6" fill="#5fe3c8"/>
+    </svg>
+    <div>
+      <div class="kicker">Product Requirements Document</div>
+      <h1>WorkRadar</h1>
+      <div class="sub">One AI-ranked view of a team’s work across Slack, Jira, GitHub and email, for Airtribe’s engineering managers.</div>
+    </div>
+    <div class="meta">
+      <b>Aditya Singh</b><br>
+      Airtribe · AI Product Management<br>
+      v1.0 · 13 October 2026<br>
+      Status: <b>MVP built, pilot-ready</b>
+    </div>
+  </header>
+
+  <div class="grid g-6-4">
+    <div>
+      <h2><span class="n">01</span>Problem statement</h2>
+      <p>An engineering manager on Airtribe’s Learning Platform team starts every day by rebuilding the state of the team from four tools. The signals that matter are a P0 bug stopping learners from joining tonight’s live class, a designer blocked for two days, and a launch go/no-go waiting on the manager’s reply. They sit beside hundreds of FYIs and bot updates, and each tool marks priority differently, or not at all. Triage eats the first hour, blockers surface a day late, and escalations get missed.</p>
+      <div class="quote">How might we give a manager one trustworthy, prioritised answer to “what needs me today?”, so they can act in five minutes instead of searching for an hour?</div>
+      <p class="muted small">WorkRadar ranks every item with a transparent score, uses AI to write the brief and triage unstructured threads, and lets the manager assign, finish or snooze work without switching tools.</p>
+    </div>
+    <div class="card dark">
+      <h3>A manager’s day today <span class="muted small" style="color:#8fb4ad">(estimates to validate)</span></h3>
+      <div class="stats" style="margin-top:2mm">
+        <div class="stat"><div class="v">4</div><div class="l">tools to check before acting</div></div>
+        <div class="stat"><div class="v">~250</div><div class="l">updates a day: Slack, Jira, PRs, mail</div></div>
+        <div class="stat"><div class="v">60–90<span style="font-size:10pt">m</span></div><div class="l">daily triage and status-chasing</div></div>
+        <div class="stat"><div class="v">&lt;5%</div><div class="l">of updates need the manager today</div></div>
+        <div class="stat"><div class="v">~1 day</div><div class="l">before a blocker reaches the manager</div></div>
+        <div class="stat"><div class="v">0</div><div class="l">shared view of “waiting on me”</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid" style="grid-template-columns: 0.95fr 2fr">
+    <div>
+      <h2><span class="n">02</span>Target users</h2>
+      <p><strong>Primary:</strong> engineering managers and tech leads at Airtribe with 5–12 reports, such as Learning Platform, Growth and Data. Their work runs to fixed external deadlines: live classes, submission deadlines and launches.</p>
+      <p><strong>Secondary:</strong> program and product leaders who coordinate cross-team launches like the GenAI Launchpad, and who need status and decisions without pinging the manager.</p>
+      <p class="muted small"><strong>Not for v1:</strong> individual contributors, and directors who need cross-team roll-ups.</p>
+    </div>
+    <div>
+      <h2><span class="n">03</span>User personas</h2>
+      <div class="grid g2" style="gap:2.6mm">
+        <div class="card persona">
+          <div class="persona-head">
+            <div class="avatar" style="background:#cbebe5;color:#1c5f51">NK</div>
+            <div><h3 style="margin:0">Neha Kapoor, 34 · primary</h3><div class="role" style="margin:0">Engineering Manager, Learning Platform · 8 reports</div></div>
+          </div>
+          <p><b>Goals</b>Protect live classes, unblock her team fast, ship the GenAI Launchpad on time.</p>
+          <p><b>Frustrations</b>Constant context switching. Requests to her get buried in threads, and she hears about blockers at stand-up.</p>
+          <p><b>Today</b>Slack, Jira, GitHub, Gmail and a paper to-do list. About 75 minutes of triage before her first decision.</p>
+          <div class="say">“By the time I’ve read everything, the day has picked my priorities for me.”</div>
+        </div>
+        <div class="card persona">
+          <div class="persona-head">
+            <div class="avatar" style="background:#cbd9eb;color:#1c395f">RB</div>
+            <div><h3 style="margin:0">Rohan Bhatia, 41 · secondary</h3><div class="role" style="margin:0">Head of Product · launch stakeholder</div></div>
+          </div>
+          <p><b>Goals</b>Make fast, confident go/no-go calls, and get launch status he can trust without a meeting.</p>
+          <p><b>Frustrations</b>Chasing managers for answers. Surprises on launch day.</p>
+          <p><b>Needs</b>His asks visible and correctly ranked on each manager’s radar, with clear owners.</p>
+          <div class="say">“I don’t need every ticket. I need to know nothing is stuck on us.”</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <h2><span class="n">04</span>User journey: Neha’s Tuesday with WorkRadar</h2>
+    <div class="journey">
+      <div class="step">
+        <div class="t">08:45 · Slack</div><div class="rail"></div>
+        <h3>Gets the morning brief</h3>
+        <p>An n8n workflow posts a 5-line brief: 4 items need her, 4 people are blocked, start with the iPhone live-class bug.</p>
+        <div class="before">Before: opens 4 tools and 60+ tabs</div>
+      </div>
+      <div class="step">
+        <div class="t">09:00 · Today</div><div class="rail"></div>
+        <h3>Sees the whole radar</h3>
+        <p>Counts, a radar of 38 open items, an AI brief with the top 3 actions and what happened overnight.</p>
+        <div class="before">Before: rebuilds the picture in her head</div>
+      </div>
+      <div class="step">
+        <div class="t">09:05 · Item detail</div><div class="rail"></div>
+        <h3>Acts with context</h3>
+        <p>Reads why LP-512 scores 86, then assigns it to Arjun as the AI suggested. She snoozes an FYI. Every action can be undone.</p>
+        <div class="before">Before: hunts for the owner and the thread</div>
+      </div>
+      <div class="step">
+        <div class="t">09:10 · Team</div><div class="rail"></div>
+        <h3>Unblocks people</h3>
+        <p>Meera has been blocked on marketing copy for 2 days. The suggestion is to approve placeholder copy and nudge Tanvi’s manager.</p>
+        <div class="before">Before: learns this at tomorrow’s stand-up</div>
+      </div>
+      <div class="step">
+        <div class="t">All day · Feed, ⌘K</div><div class="rail"></div>
+        <h3>Stays on top</h3>
+        <p>Works the keyboard triage feed and searches “blocked prs waiting on me”. Outages and AI failures degrade gracefully.</p>
+        <div class="before">Before: notification whack-a-mole</div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <h2><span class="n">05</span>Key pain points</h2>
+    <div class="pains">
+      <div class="pain"><h3>Work is fragmented</h3><p>Four tools, four priority systems. Jira has P-levels. Slack and email have none, yet hold the most urgent asks.</p></div>
+      <div class="pain"><h3>“Waiting on me” is invisible</h3><p>Decisions, reviews and replies addressed to the manager get buried in threads and inboxes.</p></div>
+      <div class="pain"><h3>Blockers hide across tools</h3><p>A PR waits on a ticket, which waits on another team. Nobody sees the chain until someone complains.</p></div>
+      <div class="pain"><h3>Urgency depends on time</h3><p>A 7 pm live class or a same-day go/no-go matters more than a “P1” due next week. Tools don’t rank by deadline.</p></div>
+      <div class="pain"><h3>Noise drowns signal</h3><p>Bots, Dependabot, FYIs and CC chains make up most of the volume and train managers to skim.</p></div>
+      <div class="pain"><h3>Black-box AI isn’t trusted</h3><p>A summary with no reasons can’t be acted on. Managers need to see why something is urgent.</p></div>
+    </div>
+  </div>
+
+  <div class="foot"><span>WorkRadar PRD · Aditya Singh · Concept project for the Airtribe AI PM program. Not affiliated with or endorsed by Airtribe. All data is fictional.</span><span>1 / 2</span></div>
+</section>
+
+<!-- ───────────────────────────── Page 2 ───────────────────────────── -->
+<section class="page">
+  <div>
+    <h2><span class="n">06</span>Success metrics <span class="muted small" style="font-family:Barlow;font-weight:400">targets 8 weeks after a 10-manager pilot</span></h2>
+    <table>
+      <thead><tr><th style="width:27%">Metric</th><th style="width:14%">Target</th><th style="width:24%">Why it matters</th><th>How we measure it</th></tr></thead>
+      <tbody>
+        <tr class="ns"><td><span class="tag ns">North star</span> <strong>Time to clarity</strong></td><td class="tgt">&lt; 5 min</td><td>From an hour of triage to minutes</td><td>Session start → first action on a top-3 ranked item</td></tr>
+        <tr><td><strong>Weekly active managers</strong> / invited</td><td class="tgt">≥ 70%</td><td>Habit and lasting value</td><td>Managers with ≥ 3 active days in the week</td></tr>
+        <tr><td><strong>Morning brief engagement</strong></td><td class="tgt">≥ 60% of days</td><td>The push drives the habit</td><td>Slack brief click-through, or Today opened by 10:00</td></tr>
+        <tr><td><strong>Blocker time to resolution</strong></td><td class="tgt">−30%</td><td>Highest-leverage manager action</td><td>Blocked flag → cleared, against a 4-week baseline</td></tr>
+        <tr><td><strong>Actions taken in WorkRadar</strong></td><td class="tgt">≥ 5 / day</td><td>People act here, not just read</td><td>Assign, done and snooze per manager, net of undos</td></tr>
+        <tr><td><strong>Ranking trust</strong></td><td class="tgt">≥ 80%</td><td>An untrusted radar gets ignored</td><td>Weekly “top 3 were right” pulse; re-rank rate &lt; 15%</td></tr>
+        <tr><td><span class="tag guard">Guardrail</span> Missed P0/P1 escalations</td><td class="tgt">0</td><td>Costs learners and revenue</td><td>Every post-mortem checks it reached the inner ring</td></tr>
+        <tr><td><span class="tag guard">Guardrail</span> AI factual errors</td><td class="tgt">&lt; 2% of briefs</td><td>One invented fact breaks trust</td><td>Weekly eval of 50 briefs against their snapshots</td></tr>
+        <tr><td><span class="tag guard">Guardrail</span> Brief latency · cost</td><td class="tgt">p95 &lt; 6 s · &lt; ₹1</td><td>Daily use at pilot scale</td><td>n8n execution logs and Gemini token usage</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div>
+    <h2><span class="n">07</span>MVP scope</h2>
+    <div class="grid" style="grid-template-columns: 1.9fr 1fr; gap:2.6mm">
+      <div class="card wash">
+        <h3>In scope (built and working in the demo)</h3>
+        <ul class="chk small cols2">
+          <li>Four sources: Slack, Jira, GitHub, Gmail (realistic mock data, n8n ingestion)</li>
+          <li>Today dashboard: radar, AI brief, needs attention, who’s blocked</li>
+          <li>Priority feed with an explainable 0–100 score and three rings</li>
+          <li>Item detail, plain-language search, ⌘K palette, Team view</li>
+          <li>Assign (AI-suggested owner), Mark done, Snooze, Undo</li>
+          <li>Gemini brief via n8n or a serverless route, with on-device fallback</li>
+          <li>Empty, error and outage states; dark mode; mobile layout</li>
+          <li>Settings: AI engine, n8n webhooks, live ranking weights</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Out of scope (v1)</h3>
+        <ul class="chk out small">
+          <li>Live OAuth and write-back to source tools (actions logged to n8n)</li>
+          <li>Director roll-ups; weights learned from behaviour</li>
+          <li>Alerts beyond the morning Slack brief</li>
+          <li>Teams, Outlook, Linear, Notion; admin and SSO</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div>
+      <h2><span class="n">08</span>Assumptions</h2>
+      <ol class="small cols2" style="padding-left:4.2mm">
+        <li><strong>Explainable beats clever.</strong> Managers will trust a deterministic score they can inspect and re-weight more than an opaque AI ranking. AI writes and triages; it doesn’t rank.</li>
+        <li><strong>Read-only access is acceptable.</strong> Airtribe security will approve least-privilege OAuth scopes if message bodies are kept no longer than 7 days and never used for training.</li>
+        <li><strong>The push builds the habit.</strong> A short Slack brief at 08:45 brings managers in daily better than a dashboard alone.</li>
+        <li><strong>Time is the strongest signal.</strong> Deadline proximity, who is waiting and what is blocked predict “needs me today” better than labels.</li>
+        <li><strong>The volume estimates hold.</strong> To validate with 5 manager interviews and a 2-week diary study before the pilot.</li>
+        <li><strong>Cost is negligible.</strong> Gemini Flash-class models and self-hosted n8n keep a brief under ₹1 and pilot running costs near zero.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div>
+    <h2><span class="n">09</span>Features</h2>
+    <div class="grid g2">
+      <div class="card">
+        <h3><span class="tag built">Must-have</span> MVP, shipped in the demo</h3>
+        <ul class="feat small">
+          <li><b>Unified priority feed</b> ranked by six weighted signals: urgency, impact, unblocks others, waiting on you, stuck, escalation.</li>
+          <li><b>AI daily brief</b>: top 3 for today, what happened, needs attention, who’s blocked and how to unblock them.</li>
+          <li><b>“Why it’s on your radar”</b>: score breakdown on every item, with adjustable weights.</li>
+          <li><b>Item detail</b>: AI summary, next step, dependencies and source context.</li>
+          <li><b>Natural-language search</b> (“blocked prs waiting on me”) and ⌘K.</li>
+          <li><b>One-click actions</b>: Assign (AI-suggested owner), Done, Snooze, Undo.</li>
+          <li><b>Team blockers</b>, sorted by who needs the manager first.</li>
+          <li><b>Graceful degradation</b>: n8n → Gemini → on-device; outage banner.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="tag next">Nice-to-have</span> Next releases</h3>
+        <ul class="feat small">
+          <li><b>Write-back</b>: assign in Jira, request reviews in GitHub, reply in Slack.</li>
+          <li><b>AI reply drafts</b> for asks waiting on the manager.</li>
+          <li><b>Learned weights</b> from what gets opened, snoozed or reordered.</li>
+          <li><b>Calendar awareness</b>: plan the top 3 around meetings and focus time.</li>
+          <li><b>1:1 prep and weekly digest</b> for each report: shipped, stuck, waiting.</li>
+          <li><b>Director roll-ups</b> across teams, with launch risk heatmaps.</li>
+          <li><b>More sources</b>: Linear, Notion, Teams, Outlook, PagerDuty.</li>
+          <li><b>Quiet hours and personal SLAs</b> (“reply to leadership within 4h”).</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card wash small" style="display:grid;grid-template-columns:auto 1fr;gap:1mm 4mm">
+    <strong>Rollout</strong><span>Week 0: interviews and diary study → Weeks 1–2: pilot with 3 Learning Platform managers (read-only) → Weeks 3–8: 10 managers with write-back, weekly metric review → Go/no-go on org-wide rollout against the north star and guardrails.</span>
+    <strong>Top risks</strong><span>Over-trusting the AI (mitigated by explainable scores, labelled engines and undo) · Privacy of message content (read-only scopes, short retention) · Ranking drift as teams change (adjustable weights, weekly trust pulse).</span>
+  </div>
+
+  <div class="foot"><span>Source, n8n workflows and docs: <a href="https://github.com/adityasingh535402-del/WorkRadar">github.com/adityasingh535402-del/WorkRadar</a> · Designs: <a href="https://www.figma.com/design/Q8RHXzIj6yOqBR4HDq5hn5">figma.com/design/Q8RHXzIj6yOqBR4HDq5hn5</a></span><span>2 / 2</span></div>
+</section>
+</body>
+</html>
