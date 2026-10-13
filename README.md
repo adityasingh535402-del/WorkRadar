@@ -13,6 +13,8 @@ Built by **Aditya Singh** as the capstone for the Airtribe AI Product Management
 
 > **Mock data.** All people, messages and tickets are fictional and generated relative to the current time, so the demo always reads as “today”. Backend integrations run in n8n demo mode; see [`n8n/`](n8n/).
 
+![WorkRadar Today dashboard](docs/screens/01-today.png)
+
 ## What’s inside
 
 | Screen | What it does |
@@ -25,6 +27,16 @@ Built by **Aditya Singh** as the capstone for the Airtribe AI Product Management
 | **Settings** | AI engine (automatic, n8n only, on-device), n8n webhooks with a connection test, live ranking weights, simulated source outages, and an empty-workspace preview. |
 | **Actions** | Assign (with an AI-suggested owner), Mark done and Snooze everywhere, with undo. Actions sync to n8n when it’s connected. |
 | **States** | First-run empty workspace, empty views, no search results, source outage banner, AI error with retry and on-device fallback, 404. |
+
+## Design
+
+- **Figma:** [WorkRadar hi-fi screens](https://www.figma.com/design/Q8RHXzIj6yOqBR4HDq5hn5), editable layers in the air-traffic-control direction (dark radar scope, flight-strip rows, Barlow type).
+- **All 15 screens as PNG:** [`docs/screens/`](docs/screens): Today (light and dark), Priority feed, Item detail, Assign, Search, Command palette, Team, Mark done + Undo, three empty states, the outage and AI error state, and mobile.
+- **Regenerate the Figma file:** [`design/figma-plugin/`](design/figma-plugin) rebuilds every screen from the running app as editable layers.
+
+| Priority feed | Item detail | Error state |
+|---|---|---|
+| ![Priority feed](docs/screens/03-priority-feed.png) | ![Item detail](docs/screens/04-item-detail.png) | ![Source outage and AI error](docs/screens/11-error-outage.png) |
 
 ## How the AI works
 
@@ -83,7 +95,8 @@ src/
   styles/          design tokens and components (light and dark)
 api/               Vercel edge routes: /api/digest, /api/action, shared prompt
 n8n/               workflows, Code-node sources, mock source payloads, validator
-docs/              PRD, AI workflow document, screenshots
+docs/              PRD, AI workflow document, screen exports
+design/            Figma plugin that rebuilds the hi-fi screens
 ```
 
 Stack: React 18, TypeScript, Vite, hand-written CSS (no UI framework), Vercel Edge Functions, n8n, Gemini. No runtime dependencies beyond React.

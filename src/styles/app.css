@@ -385,6 +385,10 @@ code {
   color: var(--halt-ink);
   font-weight: 500;
 }
+.source-row.is-off .src {
+  filter: grayscale(1);
+  opacity: 0.45;
+}
 .me {
   display: flex;
   align-items: center;
@@ -709,6 +713,12 @@ code {
 }
 .page-sub .kbd {
   margin: 0 1px;
+}
+.kbd-hints {
+  display: block;
+  margin-top: 4px;
+  font-size: 14px;
+  color: var(--ink-3);
 }
 
 .empty {
@@ -2684,8 +2694,12 @@ a.happened-text:hover {
 .connect-list li:first-child {
   border-top: 0;
 }
-.connect-list li > span {
+.connect-list li > .src {
+  flex: none;
+}
+.connect-list .connect-text {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   font-size: 14px;
@@ -2744,7 +2758,7 @@ a.happened-text:hover {
     align-items: center;
     justify-content: space-between;
     position: sticky;
-    top: 0;
+    top: env(safe-area-inset-top, 0px);
     z-index: 20;
     height: 54px;
     padding: 0 16px;

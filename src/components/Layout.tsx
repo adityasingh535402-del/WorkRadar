@@ -37,11 +37,12 @@ function SourceStatus() {
       <p className="side-label">Sources</p>
       {sources.map((src) => {
         const down = state.settings.outage === src;
+        const off = state.demo === 'empty';
         return (
-          <div key={src} className={`source-row${down ? ' is-down' : ''}`}>
+          <div key={src} className={`source-row${down ? ' is-down' : ''}${off ? ' is-off' : ''}`}>
             <SourceGlyph source={src} size={12} />
             <span className="source-name">{SOURCE_META[src].label}</span>
-            <span className="source-sync">{down ? 'Not responding' : ago(new Date(state.lastSync[src]).toISOString(), state.now)}</span>
+            <span className="source-sync">{off ? 'Not connected' : down ? 'Not responding' : ago(new Date(state.lastSync[src]).toISOString(), state.now)}</span>
           </div>
         );
       })}

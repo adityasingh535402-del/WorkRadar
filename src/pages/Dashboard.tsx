@@ -166,7 +166,7 @@ function EmptyWorkspace() {
           {sources.map((s) => (
             <li key={s.id}>
               <SourceGlyph source={s.id} size={16} />
-              <span>
+              <span className="connect-text">
                 <strong>{s.id === 'email' ? 'Gmail' : s.id === 'github' ? 'GitHub' : s.id[0].toUpperCase() + s.id.slice(1)}</strong>
                 <span>{s.text}</span>
               </span>

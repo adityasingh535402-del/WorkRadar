@@ -24,11 +24,18 @@ export function App() {
   const route = useRoute();
   const theme = useStore((s) => s.settings.theme);
 
-  // Theme: "system" follows the OS; explicit choices set data-theme.
+  // Theme: "system" follows the OS (or a theme the host page set); explicit choices set data-theme.
   useEffect(() => {
     const el = document.documentElement;
-    if (theme === 'system') delete el.dataset.theme;
-    else el.dataset.theme = theme;
+    if (theme === 'system') {
+      if (el.dataset.wrTheme) {
+        delete el.dataset.theme;
+        delete el.dataset.wrTheme;
+      }
+    } else {
+      el.dataset.theme = theme;
+      el.dataset.wrTheme = '1';
+    }
   }, [theme]);
 
   // Keep relative times and snooze expiry fresh.

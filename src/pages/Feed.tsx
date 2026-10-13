@@ -98,7 +98,7 @@ export function Feed({ route }: { route: Route }) {
         title="Priority feed"
         sub={
           <>
-            Every item from Slack, Jira, GitHub and email, ranked by how much it needs you. <span className="hide-sm">Use <Kbd>j</Kbd> <Kbd>k</Kbd> to move, <Kbd>e</Kbd> done, <Kbd>s</Kbd> snooze, <Kbd>a</Kbd> assign.</span>
+            Every item from Slack, Jira, GitHub and email, ranked by how much it needs you. <span className="hide-sm kbd-hints">Use <Kbd>j</Kbd> <Kbd>k</Kbd> to move, <Kbd>e</Kbd> done, <Kbd>s</Kbd> snooze, <Kbd>a</Kbd> assign.</span>
           </>
         }
       />
