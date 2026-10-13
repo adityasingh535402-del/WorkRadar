@@ -1,0 +1,537 @@
+{
+  "name": "WorkRadar · 2 · Source ingestion & ranking",
+  "nodes": [
+    {
+      "id": "86203347-7573-51a6-aa3a-1af6086ecc1b",
+      "name": "About this workflow",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -420
+      ],
+      "parameters": {
+        "content": "## WorkRadar · Source ingestion\nPulls Slack threads, Jira issues, GitHub PRs and Gmail messages, **normalises** them into one WorkItem schema, asks **Gemini to triage** the unstructured ones (priority, waiting on you, blocked, next step) and **ranks** everything with the same transparent score as the app.\n\nDemo mode reads API-shaped mock files from the GitHub repo. To go live, replace each fetch node with the native Slack / Jira / GitHub / Gmail node.",
+        "width": 460,
+        "height": 300,
+        "color": 4
+      }
+    },
+    {
+      "id": "ab7bb791-1e78-585e-a65f-4bc5222584fc",
+      "name": "Run now",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -120
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "598cb3a0-2972-5ba7-ac5b-c1112c379ede",
+      "name": "Every 15 minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        40
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "832eb291-dfb8-57a6-a08b-6decd7ac1cf1",
+      "name": "Get items",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        200
+      ],
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "workradar/items",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "webhookId": "5c35a37e-34f5-5012-a222-2062d45a5e1c"
+    },
+    {
+      "id": "973d69f2-7d07-5fa1-a160-faf88d1e083a",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        260,
+        40
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d928ed26-be5e-56e3-ac91-b6e352316415",
+              "name": "sourceBaseUrl",
+              "value": "https://raw.githubusercontent.com/adityasingh535402-del/WorkRadar/main/n8n/mock-sources",
+              "type": "string"
+            },
+            {
+              "id": "5398eb74-5f35-5e9d-a27d-97f860f49965",
+              "name": "model",
+              "value": "gemini-3.8-flash",
+              "type": "string"
+            },
+            {
+              "id": "a2fff75a-31c2-5d3e-a7d6-248854d22e27",
+              "name": "managerId",
+              "value": "neha",
+              "type": "string"
+            },
+            {
+              "id": "dc19bd52-ee8e-5de9-a4d0-b8f5d49fa387",
+              "name": "timezone",
+              "value": "Asia/Kolkata",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "45044cd2-6da9-5aed-a09d-a63f3a90ca3c",
+      "name": "Slack: threads",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        540,
+        -200
+      ],
+      "parameters": {
+        "url": "={{ $json.sourceBaseUrl }}/slack.json",
+        "options": {
+          "timeout": 20000,
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "b926f3a4-006e-5b87-a71f-77a03152fcbf",
+      "name": "Jira: issues",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        540,
+        -60
+      ],
+      "parameters": {
+        "url": "={{ $json.sourceBaseUrl }}/jira.json",
+        "options": {
+          "timeout": 20000,
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "913da200-7d53-5b5c-a9c5-e5847a3ffe88",
+      "name": "GitHub: pulls & issues",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        540,
+        80
+      ],
+      "parameters": {
+        "url": "={{ $json.sourceBaseUrl }}/github.json",
+        "options": {
+          "timeout": 20000,
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "067ec8f3-0641-532b-a0fb-d33b6e855019",
+      "name": "Gmail: messages",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        540,
+        220
+      ],
+      "parameters": {
+        "url": "={{ $json.sourceBaseUrl }}/gmail.json",
+        "options": {
+          "timeout": 20000,
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "d1141079-d528-5ff1-a357-26b1e8b264d2",
+      "name": "All sources",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        800,
+        0
+      ],
+      "parameters": {
+        "numberInputs": 4
+      }
+    },
+    {
+      "id": "0d6f4d0f-afa2-5c7a-a583-769ec0991f9c",
+      "name": "Normalize to WorkItems",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// n8n Code node · \"Normalize to WorkItems\" (Run once for all items)\n// Maps four different API shapes (Slack threads, Jira issues, GitHub PRs/issues,\n// Gmail messages) into one WorkItem schema, and adds first-pass signals with\n// simple rules. Gemini refines the unstructured ones in the next step.\n\nconst ROSTER = [{\"id\":\"neha\",\"name\":\"Neha Kapoor\",\"email\":\"neha@airtribe.example\",\"slack_id\":\"UNEHA\",\"github_login\":\"neha-airtribe\",\"role\":\"Engineering Manager\",\"external\":false,\"skills\":[]},{\"id\":\"rahul\",\"name\":\"Rahul Verma\",\"email\":\"rahul@airtribe.example\",\"slack_id\":\"URAHUL\",\"github_login\":\"rahul-airtribe\",\"role\":\"Senior Frontend Engineer\",\"external\":false,\"skills\":[\"frontend\",\"learner-web\",\"notifications\",\"career\"]},{\"id\":\"ananya\",\"name\":\"Ananya Iyer\",\"email\":\"ananya@airtribe.example\",\"slack_id\":\"UANANYA\",\"github_login\":\"ananya-airtribe\",\"role\":\"Backend Engineer\",\"external\":false,\"skills\":[\"backend\",\"grading\",\"payments\",\"api\"]},{\"id\":\"karan\",\"name\":\"Karan Mehta\",\"email\":\"karan@airtribe.example\",\"slack_id\":\"UKARAN\",\"github_login\":\"karan-airtribe\",\"role\":\"Full-stack Engineer\",\"external\":false,\"skills\":[\"live-sessions\",\"video\",\"mentor-connect\",\"api\"]},{\"id\":\"sneha\",\"name\":\"Sneha Reddy\",\"email\":\"sneha@airtribe.example\",\"slack_id\":\"USNEHA\",\"github_login\":\"sneha-airtribe\",\"role\":\"QA Engineer\",\"external\":false,\"skills\":[\"qa\",\"e2e\",\"release\"]},{\"id\":\"arjun\",\"name\":\"Arjun Nair\",\"email\":\"arjun@airtribe.example\",\"slack_id\":\"UARJUN\",\"github_login\":\"arjun-airtribe\",\"role\":\"Platform Engineer\",\"external\":false,\"skills\":[\"infra\",\"payments\",\"security\",\"devops\"]},{\"id\":\"meera\",\"name\":\"Meera Joshi\",\"email\":\"meera@airtribe.example\",\"slack_id\":\"UMEERA\",\"github_login\":\"meera-airtribe\",\"role\":\"Product Designer\",\"external\":false,\"skills\":[\"design\",\"copy\",\"career\"]},{\"id\":\"vikram\",\"name\":\"Vikram Rao\",\"email\":\"vikram@airtribe.example\",\"slack_id\":\"UVIKRAM\",\"github_login\":\"vikram-airtribe\",\"role\":\"Data Engineer\",\"external\":false,\"skills\":[\"data\",\"analytics\",\"leaderboard\"]},{\"id\":\"ishita\",\"name\":\"Ishita Das\",\"email\":\"ishita@airtribe.example\",\"slack_id\":\"UISHITA\",\"github_login\":\"ishita-airtribe\",\"role\":\"Program Manager\",\"external\":false,\"skills\":[\"programs\",\"mentors\",\"learners\"]},{\"id\":\"rohan\",\"name\":\"Rohan Bhatia\",\"email\":\"rohan@airtribe.example\",\"slack_id\":\"UROHAN\",\"github_login\":\"rohan-airtribe\",\"role\":\"Head of Product\",\"external\":true,\"skills\":[]},{\"id\":\"priya\",\"name\":\"Priya Menon\",\"email\":\"priya@airtribe.example\",\"slack_id\":\"UPRIYA\",\"github_login\":\"priya-airtribe\",\"role\":\"Learner Success Lead\",\"external\":true,\"skills\":[]},{\"id\":\"aakash\",\"name\":\"Aakash Gupta\",\"email\":\"aakash@airtribe.example\",\"slack_id\":\"UAAKASH\",\"github_login\":\"aakash-airtribe\",\"role\":\"Mentor Lead\",\"external\":true,\"skills\":[]},{\"id\":\"tanvi\",\"name\":\"Tanvi Shah\",\"email\":\"tanvi@airtribe.example\",\"slack_id\":\"UTANVI\",\"github_login\":\"tanvi-airtribe\",\"role\":\"Marketing Manager\",\"external\":true,\"skills\":[]},{\"id\":\"kavya\",\"name\":\"Kavya Pillai\",\"email\":\"kavya@airtribe.example\",\"slack_id\":\"UKAVYA\",\"github_login\":\"kavya-airtribe\",\"role\":\"Finance Partner\",\"external\":true,\"skills\":[]},{\"id\":\"sameer\",\"name\":\"Sameer Kulkarni\",\"email\":\"sameer@talentbridge.example\",\"slack_id\":\"USAMEER\",\"github_login\":\"sameer-airtribe\",\"role\":\"Partnerships, TalentBridge\",\"external\":true,\"skills\":[]},{\"id\":\"dependabot\",\"name\":\"Dependabot\",\"email\":\"dependabot@airtribe.example\",\"slack_id\":\"UDEPENDABOT\",\"github_login\":\"dependabot[bot]\",\"role\":\"Automated updates\",\"external\":true,\"skills\":[]},{\"id\":\"ci\",\"name\":\"Release bot\",\"email\":\"ci@airtribe.example\",\"slack_id\":\"UCI\",\"github_login\":\"airtribe-release-bot\",\"role\":\"CI/CD\",\"external\":true,\"skills\":[]}];\nconst config = $('Config').first().json;\nconst MANAGER = config.managerId;\nconst NOW = Date.now();\n\nconst slack = $('Slack: threads').first().json;\nconst jira = $('Jira: issues').first().json;\nconst github = $('GitHub: pulls & issues').first().json;\nconst gmail = $('Gmail: messages').first().json;\n\nconst byAny = new Map();\nfor (const p of ROSTER) for (const k of [p.id, p.name, p.email, p.slack_id, p.github_login]) if (k) byAny.set(String(k).toLowerCase(), p.id);\nconst pid = (u) => {\n  if (!u) return undefined;\n  if (typeof u === 'string') return byAny.get(u.toLowerCase()) || byAny.get(u.replace(/.*<|>.*/g, '').toLowerCase());\n  return byAny.get(String(u.id || u.email || u.login || u.name || u.displayName || '').toLowerCase()) || (u.name && byAny.get(u.name.toLowerCase()));\n};\nconst first = (id) => (ROSTER.find((p) => p.id === id) || { name: id || '' }).name.split(' ')[0];\nconst at = (minAgo) => (minAgo === null || minAgo === undefined ? undefined : new Date(NOW - minAgo * 60000).toISOString());\nconst inMin = (m) => (m === null || m === undefined ? undefined : new Date(Math.round((NOW + m * 60000) / 900000) * 900000).toISOString());\n\nconst managerName = first(MANAGER).toLowerCase();\nfunction textSignals(text, opts = {}) {\n  const t = String(text || '').toLowerCase();\n  const learners = Number((t.match(/(\\d+)\\s+(learners|sessions|tickets)/) || [])[1] || 0);\n  const s = {\n    learners: learners || undefined,\n    mentionsMe: t.includes('@' + managerName),\n    escalation: /incident|outage|escalat|p0\\b/.test(t) || opts.channel === 'incidents',\n    negative: /upset|complain|frustrat|still waiting|still nothing|too generic|disputed/.test(t),\n    revenue: /payment|revenue|enrol|deal|pricing|refund|launch/.test(t),\n  };\n  s.waitingOnMe = s.mentionsMe || (!!opts.direct && /\\?|can you|could you|need a (call|decision)|should we|who should/.test(t));\n  return s;\n}\nconst blockedHint = (t) => /waiting on|still waiting|blocked on|still nothing|is blocked/.test(String(t).toLowerCase());\n\nconst items = [];\n\n// Slack: one WorkItem per thread\nfor (const th of slack.threads || []) {\n  const msgs = th.messages || [];\n  const all = msgs.map((m) => m.text).join('\\n');\n  const wr = th.workradar || {};\n  const sig = textSignals(all, { channel: th.channel.name, direct: th.channel.is_im });\n  const author = pid(msgs[0] && msgs[0].user);\n  const done = wr.done_minutes_ago !== null && wr.done_minutes_ago !== undefined;\n  items.push({\n    id: wr.item_id || `slack-${th.channel.id}-${th.thread_ts_minutes_ago}`,\n    source: 'slack',\n    ref: th.channel.is_im ? `DM ${first(author)}` : `#${th.channel.name}`,\n    url: th.permalink,\n    project: wr.project || 'platform',\n    title: wr.title || String(msgs[0] ? msgs[0].text : '').slice(0, 90),\n    summary: String(msgs[0] ? msgs[0].text : ''),\n    status: done ? 'done' : blockedHint(all) && wr.assignee ? 'blocked' : 'open',\n    priority: sig.escalation && th.channel.name === 'incidents' ? 'P0' : undefined,\n    assignee: wr.assignee || undefined,\n    author,\n    createdAt: at(th.thread_ts_minutes_ago),\n    updatedAt: at(msgs.length ? msgs[msgs.length - 1].minutes_ago : th.thread_ts_minutes_ago),\n    dueAt: inMin(wr.due_minutes_from_now),\n    dueLabel: wr.due_label || undefined,\n    doneAt: done ? at(wr.done_minutes_ago) : undefined,\n    labels: [],\n    signals: sig,\n    detail: { kind: 'thread', channel: th.channel.is_im ? 'Direct message' : `#${th.channel.name}`, messages: msgs.map((m) => ({ by: pid(m.user), at: at(m.minutes_ago), text: m.text, reactions: (m.reactions || []).map((r) => `${r.name} ${r.count}`) })) },\n    activity: [],\n  });\n}\n\n// Jira\nconst JIRA_STATUS = { 'To Do': 'open', Open: 'open', 'In Progress': 'in_progress', 'In Review': 'in_review', Blocked: 'blocked', Done: 'done' };\nfor (const is of jira.issues || []) {\n  const f = is.fields;\n  const wr = f.workradar || {};\n  const link = (f.issuelinks || []).find((l) => l.inwardIssue && /block/i.test(l.type.inward || l.type.name));\n  items.push({\n    id: wr.item_id || `jira-${is.key}`,\n    source: 'jira',\n    ref: is.key,\n    url: is.self,\n    project: wr.project || 'platform',\n    title: f.summary,\n    summary: f.description,\n    status: JIRA_STATUS[f.status.name] || 'open',\n    priority: f.priority ? f.priority.name : undefined,\n    assignee: pid(f.assignee),\n    author: pid(f.reporter),\n    createdAt: at(f.created_minutes_ago),\n    updatedAt: at(f.updated_minutes_ago),\n    dueAt: inMin(f.duedate_minutes_from_now),\n    dueLabel: f.due_label || undefined,\n    doneAt: at(f.resolved_minutes_ago),\n    snoozedUntil: inMin(wr.snoozed_minutes_from_now),\n    labels: f.labels || [],\n    signals: { learners: wr.learners || undefined, revenue: !!wr.revenue, escalation: !!wr.escalation },\n    blockedBy: link ? { kind: 'item', ref: link.inwardIssue.workradar_item_id || `jira-${link.inwardIssue.key}`, reason: link.reason || `Blocked by ${link.inwardIssue.key}`, since: at(link.since_minutes_ago) } : undefined,\n    detail: { kind: 'ticket', type: f.issuetype.name, sprint: f.sprint || undefined, points: f.story_points || undefined, progress: f.progress_percent || undefined, description: f.description, comments: (f.comment.comments || []).map((c) => ({ by: pid(c.author), at: at(c.minutes_ago), text: c.body })) },\n    activity: [],\n  });\n}\n\n// GitHub\nfor (const g of github.items || []) {\n  const wr = g.workradar || {};\n  const isPr = g.type === 'pull_request';\n  const reviewers = isPr ? (g.requested_reviewers || []).map((u) => ({ id: pid(u), state: 'requested' })).concat((g.reviews || []).map((r) => ({ id: pid(r.user), state: r.state === 'APPROVED' ? 'approved' : r.state === 'CHANGES_REQUESTED' ? 'changes' : 'commented' }))) : [];\n  const reviewOnMe = reviewers.some((r) => r.id === MANAGER && r.state === 'requested');\n  let status = g.state === 'closed' || g.merged || g.type === 'release' ? 'done' : isPr ? (g.draft ? 'in_progress' : 'in_review') : 'open';\n  if (wr.blocked_by && status !== 'done') status = 'blocked';\n  const body = [g.body].concat((g.comments || []).map((c) => c.body)).join('\\n');\n  const sig = textSignals(body);\n  items.push({\n    id: wr.item_id || `gh-${g.repository}-${g.number}`,\n    source: 'github',\n    ref: g.ref_label || (isPr ? `PR #${g.number}` : `Issue #${g.number}`),\n    url: g.html_url,\n    project: wr.project || 'platform',\n    title: g.title,\n    summary: String(g.body || '').split('. ')[0] + '.',\n    status,\n    assignee: pid(g.assignee),\n    author: pid(g.user),\n    createdAt: at(g.created_minutes_ago),\n    updatedAt: at(g.updated_minutes_ago),\n    dueAt: inMin(wr.due_minutes_from_now),\n    dueLabel: wr.due_label || undefined,\n    doneAt: status === 'done' ? at(g.closed_minutes_ago) : undefined,\n    labels: (g.labels || []).map((l) => l.name),\n    signals: { learners: wr.learners || undefined, waitingOnMe: reviewOnMe, negative: sig.negative },\n    blockedBy: wr.blocked_by ? { kind: 'item', ref: wr.blocked_by.item_id, reason: wr.blocked_by.reason, since: at(wr.blocked_by.since_minutes_ago) } : undefined,\n    detail: isPr\n      ? { kind: 'pr', repo: g.repository, number: g.number, branch: g.head.ref, base: g.base.ref, additions: g.additions, deletions: g.deletions, files: g.changed_files, draft: g.draft, merged: g.merged, reviewers, checks: (g.check_runs || []).map((c) => ({ name: c.name, state: c.conclusion === 'success' ? 'passing' : c.conclusion === 'failure' ? 'failing' : 'pending' })), description: g.body, comments: (g.comments || []).map((c) => ({ by: pid(c.user), at: at(c.minutes_ago), text: c.body })) }\n      : { kind: 'issue', repo: g.repository, number: g.number, description: g.body, comments: (g.comments || []).map((c) => ({ by: pid(c.user), at: at(c.minutes_ago), text: c.body })) },\n    activity: [],\n  });\n}\n\n// Gmail\nfor (const m of gmail.messages || []) {\n  const h = Object.fromEntries((m.payload.headers || []).map((x) => [x.name.toLowerCase(), x.value]));\n  const wr = m.workradar || {};\n  const toManager = String(h.to || '').toLowerCase().includes((ROSTER.find((p) => p.id === MANAGER) || {}).email || '@@');\n  const sig = textSignals(m.payload.body_text, { direct: toManager });\n  sig.waitingOnMe = sig.waitingOnMe || (m.labelIds || []).includes('IMPORTANT');\n  const done = wr.done_minutes_ago !== null && wr.done_minutes_ago !== undefined;\n  const fromName = String(h.from || '').replace(/\\s*<.*>/, '');\n  items.push({\n    id: wr.item_id || `gmail-${m.id}`,\n    source: 'email',\n    ref: fromName,\n    url: 'https://mail.google.com/mail/u/0/#inbox/' + m.threadId,\n    project: wr.project || 'platform',\n    title: wr.title || h.subject,\n    summary: m.snippet,\n    status: done ? 'done' : 'open',\n    assignee: wr.assignee || undefined,\n    author: pid(h.from) || pid(fromName) || fromName,\n    createdAt: at(m.internal_minutes_ago),\n    updatedAt: at(m.internal_minutes_ago),\n    dueAt: inMin(wr.due_minutes_from_now),\n    dueLabel: wr.due_label || undefined,\n    doneAt: done ? at(wr.done_minutes_ago) : undefined,\n    labels: (m.labelIds || []).includes('CATEGORY_UPDATES') ? ['fyi'] : [],\n    signals: (m.labelIds || []).includes('CATEGORY_UPDATES') ? {} : sig,\n    detail: { kind: 'email', from: fromName, fromEmail: String(h.from || '').replace(/.*<|>.*/g, ''), to: String(h.to || '').split(/,\\s*/), subject: h.subject, body: String(m.payload.body_text || '').split(/\\n\\n+/), attachments: m.payload.attachments || [] },\n    activity: [],\n  });\n}\n\nreturn items.map((json) => ({ json }));\n"
+      }
+    },
+    {
+      "id": "0020082b-7b40-5c31-acf0-3e563bb269b0",
+      "name": "Prepare AI triage",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// n8n Code node · \"Prepare AI triage\" (Run once for all items)\n// Slack threads and emails have no priority or owner fields, so Gemini reads them\n// and returns structured signals. Jira and GitHub already carry structure.\n\nconst config = $('Config').first().json;\nconst ROSTER = [{\"id\":\"neha\",\"name\":\"Neha Kapoor\",\"email\":\"neha@airtribe.example\",\"slack_id\":\"UNEHA\",\"github_login\":\"neha-airtribe\",\"role\":\"Engineering Manager\",\"external\":false,\"skills\":[]},{\"id\":\"rahul\",\"name\":\"Rahul Verma\",\"email\":\"rahul@airtribe.example\",\"slack_id\":\"URAHUL\",\"github_login\":\"rahul-airtribe\",\"role\":\"Senior Frontend Engineer\",\"external\":false,\"skills\":[\"frontend\",\"learner-web\",\"notifications\",\"career\"]},{\"id\":\"ananya\",\"name\":\"Ananya Iyer\",\"email\":\"ananya@airtribe.example\",\"slack_id\":\"UANANYA\",\"github_login\":\"ananya-airtribe\",\"role\":\"Backend Engineer\",\"external\":false,\"skills\":[\"backend\",\"grading\",\"payments\",\"api\"]},{\"id\":\"karan\",\"name\":\"Karan Mehta\",\"email\":\"karan@airtribe.example\",\"slack_id\":\"UKARAN\",\"github_login\":\"karan-airtribe\",\"role\":\"Full-stack Engineer\",\"external\":false,\"skills\":[\"live-sessions\",\"video\",\"mentor-connect\",\"api\"]},{\"id\":\"sneha\",\"name\":\"Sneha Reddy\",\"email\":\"sneha@airtribe.example\",\"slack_id\":\"USNEHA\",\"github_login\":\"sneha-airtribe\",\"role\":\"QA Engineer\",\"external\":false,\"skills\":[\"qa\",\"e2e\",\"release\"]},{\"id\":\"arjun\",\"name\":\"Arjun Nair\",\"email\":\"arjun@airtribe.example\",\"slack_id\":\"UARJUN\",\"github_login\":\"arjun-airtribe\",\"role\":\"Platform Engineer\",\"external\":false,\"skills\":[\"infra\",\"payments\",\"security\",\"devops\"]},{\"id\":\"meera\",\"name\":\"Meera Joshi\",\"email\":\"meera@airtribe.example\",\"slack_id\":\"UMEERA\",\"github_login\":\"meera-airtribe\",\"role\":\"Product Designer\",\"external\":false,\"skills\":[\"design\",\"copy\",\"career\"]},{\"id\":\"vikram\",\"name\":\"Vikram Rao\",\"email\":\"vikram@airtribe.example\",\"slack_id\":\"UVIKRAM\",\"github_login\":\"vikram-airtribe\",\"role\":\"Data Engineer\",\"external\":false,\"skills\":[\"data\",\"analytics\",\"leaderboard\"]},{\"id\":\"ishita\",\"name\":\"Ishita Das\",\"email\":\"ishita@airtribe.example\",\"slack_id\":\"UISHITA\",\"github_login\":\"ishita-airtribe\",\"role\":\"Program Manager\",\"external\":false,\"skills\":[\"programs\",\"mentors\",\"learners\"]},{\"id\":\"rohan\",\"name\":\"Rohan Bhatia\",\"email\":\"rohan@airtribe.example\",\"slack_id\":\"UROHAN\",\"github_login\":\"rohan-airtribe\",\"role\":\"Head of Product\",\"external\":true,\"skills\":[]},{\"id\":\"priya\",\"name\":\"Priya Menon\",\"email\":\"priya@airtribe.example\",\"slack_id\":\"UPRIYA\",\"github_login\":\"priya-airtribe\",\"role\":\"Learner Success Lead\",\"external\":true,\"skills\":[]},{\"id\":\"aakash\",\"name\":\"Aakash Gupta\",\"email\":\"aakash@airtribe.example\",\"slack_id\":\"UAAKASH\",\"github_login\":\"aakash-airtribe\",\"role\":\"Mentor Lead\",\"external\":true,\"skills\":[]},{\"id\":\"tanvi\",\"name\":\"Tanvi Shah\",\"email\":\"tanvi@airtribe.example\",\"slack_id\":\"UTANVI\",\"github_login\":\"tanvi-airtribe\",\"role\":\"Marketing Manager\",\"external\":true,\"skills\":[]},{\"id\":\"kavya\",\"name\":\"Kavya Pillai\",\"email\":\"kavya@airtribe.example\",\"slack_id\":\"UKAVYA\",\"github_login\":\"kavya-airtribe\",\"role\":\"Finance Partner\",\"external\":true,\"skills\":[]},{\"id\":\"sameer\",\"name\":\"Sameer Kulkarni\",\"email\":\"sameer@talentbridge.example\",\"slack_id\":\"USAMEER\",\"github_login\":\"sameer-airtribe\",\"role\":\"Partnerships, TalentBridge\",\"external\":true,\"skills\":[]},{\"id\":\"dependabot\",\"name\":\"Dependabot\",\"email\":\"dependabot@airtribe.example\",\"slack_id\":\"UDEPENDABOT\",\"github_login\":\"dependabot[bot]\",\"role\":\"Automated updates\",\"external\":true,\"skills\":[]},{\"id\":\"ci\",\"name\":\"Release bot\",\"email\":\"ci@airtribe.example\",\"slack_id\":\"UCI\",\"github_login\":\"airtribe-release-bot\",\"role\":\"CI/CD\",\"external\":true,\"skills\":[]}];\nconst team = ROSTER.filter((p) => !p.external).map((p) => ({ id: p.id, name: p.name, role: p.role, skills: p.skills }));\nconst manager = ROSTER.find((p) => p.id === config.managerId);\n\nconst unstructured = $input\n  .all()\n  .map((i) => i.json)\n  .filter((it) => (it.source === 'slack' || it.source === 'email') && it.status !== 'done' && !(it.labels || []).includes('fyi'))\n  .map((it) => ({\n    id: it.id,\n    source: it.source,\n    where: it.ref,\n    text:\n      it.detail.kind === 'thread'\n        ? it.detail.messages.map((m) => `${m.by}: ${m.text}`).join('\\n')\n        : `${it.detail.subject}\\n${it.detail.body.join('\\n')}`,\n  }));\n\nconst SYSTEM = `You triage workplace messages for ${manager.name}, ${manager.role} of the Learning Platform team at Airtribe (an online learning company running live cohort programs).\nFor every thread, return one object in \"results\" with:\n- id: the thread id, unchanged\n- priority: P0 (live incident hurting learners now), P1 (urgent, learners or revenue affected), P2 (normal), P3 (low), or NONE for FYI\n- waitingOnManager: true only if someone is explicitly waiting for ${manager.name.split(' ')[0]} to decide, review or reply\n- blocked: true if a teammate says they cannot proceed\n- escalation: true for incidents or escalations from leadership or customers\n- negative: true if the tone shows frustration or complaints\n- summary: one plain sentence under 30 words with the key facts (numbers, deadlines)\n- nextStep: one sentence under 25 words telling the manager what to do\n- suggestedOwner: the team member id best placed to own it, or \"\" if it is the manager's own decision\nUse only the facts in the text. Team: ${JSON.stringify(team)}`;\n\nconst schema = {\n  type: 'OBJECT',\n  properties: {\n    results: {\n      type: 'ARRAY',\n      items: {\n        type: 'OBJECT',\n        properties: {\n          id: { type: 'STRING' },\n          priority: { type: 'STRING', enum: ['P0', 'P1', 'P2', 'P3', 'NONE'] },\n          waitingOnManager: { type: 'BOOLEAN' },\n          blocked: { type: 'BOOLEAN' },\n          escalation: { type: 'BOOLEAN' },\n          negative: { type: 'BOOLEAN' },\n          summary: { type: 'STRING' },\n          nextStep: { type: 'STRING' },\n          suggestedOwner: { type: 'STRING' },\n        },\n        required: ['id', 'priority', 'waitingOnManager', 'blocked', 'escalation', 'negative', 'summary', 'nextStep', 'suggestedOwner'],\n      },\n    },\n  },\n  required: ['results'],\n};\n\nreturn [\n  {\n    json: {\n      model: config.model,\n      count: unstructured.length,\n      request: {\n        systemInstruction: { parts: [{ text: SYSTEM }] },\n        contents: [{ role: 'user', parts: [{ text: JSON.stringify(unstructured) }] }],\n        generationConfig: { temperature: 0.2, responseMimeType: 'application/json', responseSchema: schema },\n      },\n    },\n  },\n];\n"
+      }
+    },
+    {
+      "id": "bc169295-f639-5d5c-a167-ad0d25ad485f",
+      "name": "Gemini: triage messages",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1520,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $json.model }}:generateContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.request) }}",
+        "options": {
+          "timeout": 45000
+        }
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "workradar-gemini",
+          "name": "Gemini – WorkRadar"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 3000,
+      "onError": "continueErrorOutput",
+      "notesInFlow": true,
+      "notes": "Select your “Gemini – WorkRadar” credential here"
+    },
+    {
+      "id": "9d79470c-c670-58c4-a838-ca7c25951b77",
+      "name": "Apply AI signals & rank",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1780,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// n8n Code node · \"Apply AI signals & rank\" (Run once for all items)\n// Merges Gemini's triage into the normalised items, computes the same transparent\n// priority score the app uses, and builds the snapshot the digest workflow reads.\n\nconst config = $('Config').first().json;\nconst ROSTER = [{\"id\":\"neha\",\"name\":\"Neha Kapoor\",\"email\":\"neha@airtribe.example\",\"slack_id\":\"UNEHA\",\"github_login\":\"neha-airtribe\",\"role\":\"Engineering Manager\",\"external\":false,\"skills\":[]},{\"id\":\"rahul\",\"name\":\"Rahul Verma\",\"email\":\"rahul@airtribe.example\",\"slack_id\":\"URAHUL\",\"github_login\":\"rahul-airtribe\",\"role\":\"Senior Frontend Engineer\",\"external\":false,\"skills\":[\"frontend\",\"learner-web\",\"notifications\",\"career\"]},{\"id\":\"ananya\",\"name\":\"Ananya Iyer\",\"email\":\"ananya@airtribe.example\",\"slack_id\":\"UANANYA\",\"github_login\":\"ananya-airtribe\",\"role\":\"Backend Engineer\",\"external\":false,\"skills\":[\"backend\",\"grading\",\"payments\",\"api\"]},{\"id\":\"karan\",\"name\":\"Karan Mehta\",\"email\":\"karan@airtribe.example\",\"slack_id\":\"UKARAN\",\"github_login\":\"karan-airtribe\",\"role\":\"Full-stack Engineer\",\"external\":false,\"skills\":[\"live-sessions\",\"video\",\"mentor-connect\",\"api\"]},{\"id\":\"sneha\",\"name\":\"Sneha Reddy\",\"email\":\"sneha@airtribe.example\",\"slack_id\":\"USNEHA\",\"github_login\":\"sneha-airtribe\",\"role\":\"QA Engineer\",\"external\":false,\"skills\":[\"qa\",\"e2e\",\"release\"]},{\"id\":\"arjun\",\"name\":\"Arjun Nair\",\"email\":\"arjun@airtribe.example\",\"slack_id\":\"UARJUN\",\"github_login\":\"arjun-airtribe\",\"role\":\"Platform Engineer\",\"external\":false,\"skills\":[\"infra\",\"payments\",\"security\",\"devops\"]},{\"id\":\"meera\",\"name\":\"Meera Joshi\",\"email\":\"meera@airtribe.example\",\"slack_id\":\"UMEERA\",\"github_login\":\"meera-airtribe\",\"role\":\"Product Designer\",\"external\":false,\"skills\":[\"design\",\"copy\",\"career\"]},{\"id\":\"vikram\",\"name\":\"Vikram Rao\",\"email\":\"vikram@airtribe.example\",\"slack_id\":\"UVIKRAM\",\"github_login\":\"vikram-airtribe\",\"role\":\"Data Engineer\",\"external\":false,\"skills\":[\"data\",\"analytics\",\"leaderboard\"]},{\"id\":\"ishita\",\"name\":\"Ishita Das\",\"email\":\"ishita@airtribe.example\",\"slack_id\":\"UISHITA\",\"github_login\":\"ishita-airtribe\",\"role\":\"Program Manager\",\"external\":false,\"skills\":[\"programs\",\"mentors\",\"learners\"]},{\"id\":\"rohan\",\"name\":\"Rohan Bhatia\",\"email\":\"rohan@airtribe.example\",\"slack_id\":\"UROHAN\",\"github_login\":\"rohan-airtribe\",\"role\":\"Head of Product\",\"external\":true,\"skills\":[]},{\"id\":\"priya\",\"name\":\"Priya Menon\",\"email\":\"priya@airtribe.example\",\"slack_id\":\"UPRIYA\",\"github_login\":\"priya-airtribe\",\"role\":\"Learner Success Lead\",\"external\":true,\"skills\":[]},{\"id\":\"aakash\",\"name\":\"Aakash Gupta\",\"email\":\"aakash@airtribe.example\",\"slack_id\":\"UAAKASH\",\"github_login\":\"aakash-airtribe\",\"role\":\"Mentor Lead\",\"external\":true,\"skills\":[]},{\"id\":\"tanvi\",\"name\":\"Tanvi Shah\",\"email\":\"tanvi@airtribe.example\",\"slack_id\":\"UTANVI\",\"github_login\":\"tanvi-airtribe\",\"role\":\"Marketing Manager\",\"external\":true,\"skills\":[]},{\"id\":\"kavya\",\"name\":\"Kavya Pillai\",\"email\":\"kavya@airtribe.example\",\"slack_id\":\"UKAVYA\",\"github_login\":\"kavya-airtribe\",\"role\":\"Finance Partner\",\"external\":true,\"skills\":[]},{\"id\":\"sameer\",\"name\":\"Sameer Kulkarni\",\"email\":\"sameer@talentbridge.example\",\"slack_id\":\"USAMEER\",\"github_login\":\"sameer-airtribe\",\"role\":\"Partnerships, TalentBridge\",\"external\":true,\"skills\":[]},{\"id\":\"dependabot\",\"name\":\"Dependabot\",\"email\":\"dependabot@airtribe.example\",\"slack_id\":\"UDEPENDABOT\",\"github_login\":\"dependabot[bot]\",\"role\":\"Automated updates\",\"external\":true,\"skills\":[]},{\"id\":\"ci\",\"name\":\"Release bot\",\"email\":\"ci@airtribe.example\",\"slack_id\":\"UCI\",\"github_login\":\"airtribe-release-bot\",\"role\":\"CI/CD\",\"external\":true,\"skills\":[]}];\nconst MANAGER = config.managerId;\nconst NOW = Date.now();\nconst items = $('Normalize to WorkItems').all().map((i) => JSON.parse(JSON.stringify(i.json)));\nconst byId = new Map(items.map((i) => [i.id, i]));\nconst nameOf = (id) => (ROSTER.find((p) => p.id === id) || { name: id || 'Unassigned' }).name;\nconst first = (id) => nameOf(id).split(' ')[0];\n\n// 1. AI triage (skipped gracefully if Gemini failed)\nlet ai = [];\nlet aiError = null;\nconst res = $input.first().json;\ntry {\n  if (res.error) throw new Error(res.error.message || 'Gemini request failed');\n  const parts = res.candidates[0].content.parts.filter((p) => !p.thought && p.text);\n  ai = JSON.parse(parts.map((p) => p.text).join('')).results || [];\n} catch (e) {\n  aiError = String(e.message || e);\n}\nfor (const r of ai) {\n  const it = byId.get(r.id);\n  if (!it) continue;\n  if (r.priority && r.priority !== 'NONE' && !it.priority) it.priority = r.priority;\n  it.signals.waitingOnMe = it.signals.waitingOnMe || !!r.waitingOnManager;\n  it.signals.escalation = it.signals.escalation || !!r.escalation;\n  it.signals.negative = it.signals.negative || !!r.negative;\n  if (r.blocked && it.status === 'open' && it.assignee) it.status = 'blocked';\n  if (r.summary) it.summary = r.summary;\n  if (r.nextStep) it.nextStep = r.nextStep;\n  if (r.suggestedOwner && !it.assignee) it.suggestedOwner = r.suggestedOwner;\n  it.aiTriaged = true;\n}\n\n// 2. Score (mirrors src/lib/scoring.ts in the app)\nconst W = config.weights || { urgency: 30, impact: 25, blocking: 20, waiting: 15, staleness: 5, escalation: 5 };\nconst PRI = { P0: 1, P1: 0.8, P2: 0.5, P3: 0.25 };\nconst blocks = new Map();\nfor (const it of items) if (it.status !== 'done' && it.blockedBy && it.blockedBy.kind === 'item') blocks.set(it.blockedBy.ref, (blocks.get(it.blockedBy.ref) || []).concat(it.id));\nconst hoursSince = (iso) => (NOW - new Date(iso).getTime()) / 3600000;\nconst dur = (iso) => {\n  const h = hoursSince(iso);\n  return h < 1 ? `${Math.max(1, Math.round(h * 60))}m` : h < 48 ? `${Math.round(h)}h` : `${Math.round(h / 24)}d`;\n};\n\nfunction score(it) {\n  const f = { urgency: [0.1, 'No deadline'], impact: [0.4, 'Normal priority'], blocking: [0, ''], waiting: [0, ''], staleness: [0, ''], escalation: [0, ''] };\n  if (it.dueAt) {\n    const h = (new Date(it.dueAt).getTime() - NOW) / 3600000;\n    const what = it.dueLabel || 'Due';\n    f.urgency = h < 0 ? [1, `Overdue by ${dur(it.dueAt)}`] : h <= 6 ? [0.95, `${what} in ${Math.max(1, Math.round(h))}h`] : h <= 24 ? [0.75, `${what} within a day`] : h <= 72 ? [0.45, `${what} in ${Math.round(h / 24)} days`] : h <= 168 ? [0.25, `${what} this week`] : [0.1, `${what} later`];\n  }\n  let imp = it.priority ? PRI[it.priority] : 0.4;\n  const parts = [];\n  if (it.priority) parts.push(it.source === 'jira' ? it.priority : `Inferred ${it.priority}`);\n  if (it.signals.learners) {\n    imp += Math.min(0.4, Math.log10(1 + it.signals.learners) / 6);\n    parts.push(`${it.signals.learners} learners affected`);\n  }\n  if (it.signals.revenue) {\n    imp += 0.15;\n    parts.push('Revenue at stake');\n  }\n  f.impact = [Math.min(1, imp), parts.join(', ') || 'Normal priority'];\n  const waiting = (blocks.get(it.id) || []).map((id) => byId.get(id)).filter(Boolean);\n  if (waiting.length) f.blocking = [waiting.length >= 3 ? 1 : waiting.length === 2 ? 0.85 : 0.65, `Unblocks ${[...new Set(waiting.map((w) => first(w.assignee)))].join(' and ')}`];\n  if (it.signals.waitingOnMe) f.waiting = [1, `${first(it.author)} is waiting on you`];\n  else if (it.signals.mentionsMe) f.waiting = [0.6, 'You were mentioned'];\n  else if (!it.assignee && (it.priority === 'P0' || it.priority === 'P1')) f.waiting = [0.7, 'Unassigned and needs an owner'];\n  if (it.status !== 'done') {\n    const ref = it.status === 'blocked' && it.blockedBy && it.blockedBy.since ? it.blockedBy.since : it.updatedAt;\n    const h = hoursSince(ref);\n    const what = it.status === 'blocked' ? 'Blocked' : it.signals.waitingOnMe ? 'Unanswered' : 'No update';\n    if (h >= 24) f.staleness = [1, `${what} for ${dur(ref)}`];\n    else if (h >= 8) f.staleness = [0.6, `${what} for ${dur(ref)}`];\n  }\n  if (it.signals.escalation) f.escalation = [1, it.priority === 'P0' ? 'Live incident' : 'Escalated'];\n  else if (it.signals.negative) f.escalation = [0.5, 'Frustration in the thread'];\n\n  const keys = Object.keys(W);\n  const total = keys.reduce((s, k) => s + W[k], 0) || 1;\n  let sc = Math.round(Math.min(99, (keys.reduce((s, k) => s + W[k] * f[k][0], 0) / total) * 125));\n  if (it.priority === 'P0' && it.status !== 'done') sc = Math.max(sc, 97);\n  if (it.status === 'done') sc = 0;\n  const why = keys\n    .filter((k) => f[k][0] > 0.25 && f[k][1])\n    .sort((a, b) => W[b] * f[b][0] - W[a] * f[a][0])\n    .slice(0, 2)\n    .map((k) => f[k][1])\n    .join('. ');\n  return { score: sc, ring: sc >= 75 ? 'now' : sc >= 50 ? 'today' : 'later', why: why || 'Low signal' };\n}\n\nconst snoozed = (it) => it.snoozedUntil && new Date(it.snoozedUntil).getTime() > NOW;\nconst ranked = items\n  .filter((it) => it.status !== 'done' && !snoozed(it))\n  .map((it) => Object.assign(it, score(it)))\n  .sort((a, b) => b.score - a.score);\n\n// 3. Blocked people and today's events\nconst blockedPeople = items\n  .filter((it) => it.status === 'blocked' && it.assignee && it.blockedBy)\n  .map((it) => {\n    const blocker = it.blockedBy.kind === 'item' ? byId.get(it.blockedBy.ref) : null;\n    const onManager = !!(blocker && blocker.signals && blocker.signals.waitingOnMe);\n    return { person: nameOf(it.assignee), personId: it.assignee, itemId: it.id, ref: it.ref, blockedOn: it.blockedBy.reason, blockedFor: it.blockedBy.since ? dur(it.blockedBy.since) : '', blockedByManager: onManager };\n  });\nconst happenedToday = items\n  .filter((it) => it.doneAt && NOW - new Date(it.doneAt).getTime() < 86400000)\n  .sort((a, b) => new Date(b.doneAt) - new Date(a.doneAt))\n  .slice(0, 8)\n  .map((it) => ({ text: it.source === 'jira' ? `${first(it.assignee)} closed ${it.ref}: ${it.title}` : it.title, itemId: it.id, at: it.doneAt }));\n\nconst manager = ROSTER.find((p) => p.id === MANAGER);\nconst snapshot = {\n  manager: { name: manager.name, role: manager.role, team: 'Learning Platform', company: 'Airtribe' },\n  now: new Date(NOW).toISOString(),\n  timezone: config.timezone,\n  team: ROSTER.filter((p) => !p.external).map((p) => ({ id: p.id, name: p.name, role: p.role })),\n  openItems: ranked.slice(0, 24).map((it) => ({ id: it.id, source: it.source, ref: it.ref, title: it.title, summary: it.summary, status: it.status, priority: it.priority || null, assignee: it.assignee ? nameOf(it.assignee) : null, due: it.dueAt || null, score: it.score, ring: it.ring, why: it.why, blockedBy: it.blockedBy ? it.blockedBy.reason : null, waitingOnManager: !!it.signals.waitingOnMe, suggestedNextStep: it.nextStep || null })),\n  blockedPeople,\n  happenedToday,\n};\n\nconst out = { generatedAt: new Date(NOW).toISOString(), aiTriaged: ai.length, aiError, counts: { total: items.length, open: ranked.length, now: ranked.filter((r) => r.ring === 'now').length, blockedPeople: blockedPeople.length }, snapshot, items };\n$getWorkflowStaticData('global').lastSnapshot = { generatedAt: out.generatedAt, counts: out.counts };\nreturn [{ json: out }];\n"
+      }
+    },
+    {
+      "id": "79269e47-dbda-5579-ad3d-e4a6fe8d9d9b",
+      "name": "Called from a webhook?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2020,
+        0
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "469d7064-2e23-5f03-a703-9f7fb47a4a9c",
+              "leftValue": "={{ $('Get items').isExecuted }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "b46d40d4-c03e-5a30-a1b3-b89c34663cf1",
+      "name": "Return ranked items",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        2260,
+        -80
+      ],
+      "parameters": {
+        "respondWith": "firstIncomingItem",
+        "options": {}
+      }
+    },
+    {
+      "id": "a0ad87a7-dc77-543f-ad3c-0a4da332d183",
+      "name": "Go live",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        480,
+        360
+      ],
+      "parameters": {
+        "content": "### Go live\nSwap the four fetch nodes for native nodes:\n- **Slack**: conversations.history + replies for your channels and DMs\n- **Jira**: search with JQL `project = LP AND updated >= -7d`\n- **GitHub**: pull requests and issues for your repos\n- **Gmail**: messages in INBOX from the last 2 days\n\nKeep the field names the normaliser expects, or edit it.",
+        "width": 380,
+        "height": 240,
+        "color": 6
+      }
+    }
+  ],
+  "connections": {
+    "Run now": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Every 15 minutes": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get items": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Slack: threads",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Jira: issues",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "GitHub: pulls & issues",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Gmail: messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack: threads": {
+      "main": [
+        [
+          {
+            "node": "All sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jira: issues": {
+      "main": [
+        [
+          {
+            "node": "All sources",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "GitHub: pulls & issues": {
+      "main": [
+        [
+          {
+            "node": "All sources",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Gmail: messages": {
+      "main": [
+        [
+          {
+            "node": "All sources",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "All sources": {
+      "main": [
+        [
+          {
+            "node": "Normalize to WorkItems",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize to WorkItems": {
+      "main": [
+        [
+          {
+            "node": "Prepare AI triage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare AI triage": {
+      "main": [
+        [
+          {
+            "node": "Gemini: triage messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini: triage messages": {
+      "main": [
+        [
+          {
+            "node": "Apply AI signals & rank",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Apply AI signals & rank",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apply AI signals & rank": {
+      "main": [
+        [
+          {
+            "node": "Called from a webhook?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Called from a webhook?": {
+      "main": [
+        [
+          {
+            "node": "Return ranked items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Kolkata",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "active": false,
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}

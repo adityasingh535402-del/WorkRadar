@@ -1,0 +1,1017 @@
+{
+  "total": 18,
+  "issues": [
+    {
+      "key": "LP-512",
+      "self": "https://jira.example.com/browse/LP-512",
+      "fields": {
+        "summary": "Payment webhook retries fail for GenAI Launchpad enrollments",
+        "description": "Since Friday, payment confirmation webhooks that fail on the first attempt are never retried successfully. The retry worker hits a 10 s timeout calling the enrollment service. Result: learners are charged but not enrolled in GenAI Launchpad. 14 cases so far, refunds requested in 2.",
+        "issuetype": {
+          "name": "Bug"
+        },
+        "priority": {
+          "name": "P1"
+        },
+        "status": {
+          "name": "To Do"
+        },
+        "assignee": null,
+        "reporter": {
+          "id": "ishita",
+          "name": "Ishita Das",
+          "email": "ishita@airtribe.example",
+          "slack_id": "UISHITA",
+          "github_login": "ishita-airtribe"
+        },
+        "labels": [
+          "revenue",
+          "launch-blocker"
+        ],
+        "created_minutes_ago": 260,
+        "updated_minutes_ago": 40,
+        "resolved_minutes_ago": null,
+        "duedate_minutes_from_now": 240,
+        "due_label": "Needed before go/no-go",
+        "sprint": "LP Sprint 41",
+        "story_points": 3,
+        "progress_percent": null,
+        "issuelinks": [],
+        "comment": {
+          "comments": [
+            {
+              "author": {
+                "id": "ishita",
+                "name": "Ishita Das",
+                "email": "ishita@airtribe.example",
+                "slack_id": "UISHITA",
+                "github_login": "ishita-airtribe"
+              },
+              "body": "Learner Success is manually enrolling these for now but it won’t scale on launch day.",
+              "minutes_ago": 260
+            },
+            {
+              "author": {
+                "id": "ananya",
+                "name": "Ananya Iyer",
+                "email": "ananya@airtribe.example",
+                "slack_id": "UANANYA",
+                "github_login": "ananya-airtribe"
+              },
+              "body": "I can take a look after the grade sync fix merges, but that might be tomorrow.",
+              "minutes_ago": 40
+            }
+          ]
+        },
+        "workradar": {
+          "item_id": "wr-103",
+          "project": "launchpad",
+          "learners": 14,
+          "revenue": true,
+          "escalation": true,
+          "snoozed_minutes_from_now": null
+        }
+      }
+    },
+    {
+      "key": "LP-498",
+      "self": "https://jira.example.com/browse/LP-498",
+      "fields": {
+        "summary": "Show re-submission grades on the mentor dashboard",
+        "description": "Mentors should see the latest grade and AI feedback when a learner re-submits, with a link to the previous attempt.",
+        "issuetype": {
+          "name": "Story"
+        },
+        "priority": {
+          "name": "P1"
+        },
+        "status": {
+          "name": "Blocked"
+        },
+        "assignee": {
+          "id": "ananya",
+          "name": "Ananya Iyer",
+          "email": "ananya@airtribe.example",
+          "slack_id": "UANANYA",
+          "github_login": "ananya-airtribe"
+        },
+        "reporter": {
+          "id": "meera",
+          "name": "Meera Joshi",
+          "email": "meera@airtribe.example",
+          "slack_id": "UMEERA",
+          "github_login": "meera-airtribe"
+        },
+        "labels": [
+          "mentor-facing"
+        ],
+        "created_minutes_ago": 5800,
+        "updated_minutes_ago": 1560,
+        "resolved_minutes_ago": null,
+        "duedate_minutes_from_now": 1260,
+        "due_label": null,
+        "sprint": "LP Sprint 41",
+        "story_points": 5,
+        "progress_percent": 85,
+        "issuelinks": [
+          {
+            "type": {
+              "name": "Blocks",
+              "inward": "is blocked by"
+            },
+            "inwardIssue": {
+              "key": "PR #1284",
+              "workradar_item_id": "wr-102"
+            },
+            "reason": "Waiting on your review of PR #1284",
+            "since_minutes_ago": 1560
+          }
+        ],
+        "comment": {
+          "comments": [
+            {
+              "author": {
+                "id": "ananya",
+                "name": "Ananya Iyer",
+                "email": "ananya@airtribe.example",
+                "slack_id": "UANANYA",
+                "github_login": "ananya-airtribe"
+              },
+              "body": "Moving to blocked until #1284 is reviewed.",
+              "minutes_ago": 1560
+            }
+          ]
+        },
+        "workradar": {
+          "item_id": "wr-106",
+          "project": "review",
+          "learners": 140,
+          "revenue": false,
+          "escalation": false,
+          "snoozed_minutes_from_now": null
+        }
+      }
+    },
+    {
+      "key": "LP-505",
+      "self": "https://jira.example.com/browse/LP-505",
+      "fields": {
+        "summary": "Grant read-replica access for the learner-progress pipeline",
+        "description": "Create a read-only role on the analytics read replica for the learner-progress ETL job and share the credentials through the secrets manager.",
+        "issuetype": {
+          "name": "Task"
+        },
+        "priority": {
+          "name": "P2"
+        },
+        "status": {
+          "name": "To Do"
+        },
+        "assignee": {
+          "id": "arjun",
+          "name": "Arjun Nair",
+          "email": "arjun@airtribe.example",
+          "slack_id": "UARJUN",
+          "github_login": "arjun-airtribe"
+        },
+        "reporter": {
+          "id": "vikram",
+          "name": "Vikram Rao",
+          "email": "vikram@airtribe.example",
+          "slack_id": "UVIKRAM",
+          "github_login": "vikram-airtribe"
+        },
+        "labels": [
+          "access"
+        ],
+        "created_minutes_ago": 1500,
+        "updated_minutes_ago": 1500,
+        "resolved_minutes_ago": null,
+        "duedate_minutes_from_now": 2700,
+        "due_label": null,
+        "sprint": "LP Sprint 41",
+        "story_points": 1,
+        "progress_percent": null,
+        "issuelinks": [],
+        "comment": {
+          "comments": []
+        },
+        "workradar": {
+          "item_id": "wr-108",
+          "project": "platform",
+          "learners": 0,
+          "revenue": false,
+          "escalation": false,
+          "snoozed_minutes_from_now": null
+        }
+      }
+    },
+    {
+      "key": "LP-490",
+      "self": "https://jira.example.com/browse/LP-490",
+      "fields": {
+        "summary": "Cohort progress dashboard for program managers",
+        "description": "Program managers need a weekly view of learner progress per cohort: assignment completion, live session attendance and mentor session usage.",
+        "issuetype": {
+          "name": "Story"
+        },
+        "priority": {
+          "name": "P2"
+        },
+        "status": {
+          "name": "Blocked"
+        },
+        "assignee": {
+          "id": "vikram",
+          "name": "Vikram Rao",
+          "email": "vikram@airtribe.example",
+          "slack_id": "UVIKRAM",
+          "github_login": "vikram-airtribe"
+        },
+        "reporter": {
+          "id": "ishita",
+          "name": "Ishita Das",
+          "email": "ishita@airtribe.example",
+          "slack_id": "UISHITA",
+          "github_login": "ishita-airtribe"
+        },
+        "labels": [],
+        "created_minutes_ago": 8600,
+        "updated_minutes_ago": 1450,
+        "resolved_minutes_ago": null,
+        "duedate_minutes_from_now": 4305,
+        "due_label": "Demo to Program team",
+        "sprint": "LP Sprint 41",
+        "story_points": 8,
+        "progress_percent": 60,
+        "issuelinks": [
+          {
+            "type": {
+              "name": "Blocks",
+              "inward": "is blocked by"
+            },
+            "inwardIssue": {
+              "key": "LP-505",
+              "workradar_item_id": "wr-108"
+            },
+            "reason": "Needs read-replica access from Arjun (LP-505)",
+            "since_minutes_ago": 1450
+          }
+        ],
+        "comment": {
+          "comments": [
+            {
+              "author": {
+                "id": "vikram",
+                "name": "Vikram Rao",
+                "email": "vikram@airtribe.example",
+                "slack_id": "UVIKRAM",
+                "github_login": "vikram-airtribe"
+              },
+              "body": "Blocked on LP-505. Using sample data until then.",
+              "minutes_ago": 1450
+            }
+          ]
+        },
+        "workradar": {
+          "item_id": "wr-109",
+          "project": "review",
+          "learners": 0,
+          "revenue": false,
+          "escalation": false,
+          "snoozed_minutes_from_now": null
+        }
+      }
+    },
+    {
+      "key": "LP-501",
+      "self": "https://jira.example.com/browse/LP-501",
+      "fields": {
+        "summary": "Mentor slots API v2 with timezone support",
+        "description": "Return mentor availability in UTC with the mentor’s timezone, and accept bookings in any timezone.",
+        "issuetype": {
+          "name": "Story"
+        },
+        "priority": {
+          "name": "P2"
+        },
+        "status": {
+          "name": "In Progress"
+        },
+        "assignee": {
+          "id": "karan",
+          "name": "Karan Mehta",
+          "email": "karan@airtribe.example",
+          "slack_id": "UKARAN",
+          "github_login": "karan-airtribe"
+        },
+        "reporter": {
+          "id": "karan",
+          "name": "Karan Mehta",
+          "email": "karan@airtribe.example",
+          "slack_id": "UKARAN",
+          "github_login": "karan-airtribe"
+        },
+        "labels": [],
+        "created_minutes_ago": 4300,
+        "updated_minutes_ago": 500,
+        "resolved_minutes_ago": null,
+        "duedate_minutes_from_now": 1500,
+        "due_label": null,
+        "sprint": "LP Sprint 41",
+        "story_points": 5,
+        "progress_percent": 55,
+        "issuelinks": [],
+        "comment": {
+          "comments": []
+        },
+        "workradar": {
+          "item_id": "wr-111",
+          "project": "mentor",
+          "learners": 0,
+          "revenue": false,
+          "escalation": false,
+          "snoozed_minutes_from_now": null
+        }
+      }
+    },
+    {
+      "key": "LP-517",
+      "self": "https://jira.example.com/browse/LP-517",
+      "fields": {
+        "summary": "Assignment uploads over 25 MB fail silently",
+        "description": "Uploads above 25 MB never complete. The client shows no error. 9 learners affected so far, mostly AI-First Software Engineering video walkthroughs.",
+        "issuetype": {
+          "name": "Bug"
+        },
+        "priority": {
+          "name": "P1"
+        },
+        "status": {
+          "name": "To Do"
+        },
+        "assignee": {
+          "id": "arjun",
+          "name": "Arjun Nair",
+          "email": "arjun@airtribe.example",
+          "slack_id": "UARJUN",
+          "github_login": "arjun-airtribe"
+        },
+        "reporter": {
+          "id": "sneha",
+          "name": "Sneha Reddy",
+          "email": "sneha@airtribe.example",
+          "slack_id": "USNEHA",
+          "github_login": "sneha-airtribe"
+        },
+        "labels": [
+          "learner-facing"
+        ],
+        "created_minutes_ago": 210,
+        "updated_minutes_ago": 210,
+        "resolved_minutes_ago": null,
+        "duedate_minutes_from_now": 1395,
+        "due_label": "Week 6 submission deadline",
+        "sprint": "LP Sprint 41",
+        "story_points": 2,
+        "progress_percent": null,
+        "issuelinks": [],
+        "comment": {
+          "comments": [
+            {
+              "author": {
+                "id": "sneha",
+                "name": "Sneha Reddy",
+                "email": "sneha@airtribe.example",
+                "slack_id": "USNEHA",
+                "github_login": "sneha-airtribe"
+              },
+              "body": "Reproduced with a 30 MB file. Proxy returns 413 but the uploader swallows it.",
+              "minutes_ago": 210
+            }
+          ]
+        },
+        "workradar": {
+          "item_id": "wr-117",
+          "project": "review",
+          "learners": 9,
+          "revenue": false,
+          "escalation": false,
+          "snoozed_minutes_from_now": null
+        }
+      }
+    },
+    {
+      "key": "LP-519",
+      "self": "https://jira.example.com/browse/LP-519",
+      "fields": {
+        "summary": "Write a rollback runbook for video SDK upgrades",
+        "description": "Document the canary rollback steps for the video SDK, including how to keep captions working.",
+        "issuetype": {
+          "name": "Task"
+        },
+        "priority": {
+          "name": "P2"
+        },
+        "status": {
+          "name": "To Do"
+        },
+        "assignee": null,
+        "reporter": {
+          "id": "arjun",
+          "name": "Arjun Nair",
+          "email": "arjun@airtribe.example",
+          "slack_id": "UARJUN",
+          "github_login": "arjun-airtribe"
+        },
+        "labels": [],
+        "created_minutes_ago": 30,
+        "updated_minutes_ago": 30,
+        "resolved_minutes_ago": null,
+        "duedate_minutes_from_now": 7200,
+        "due_label": null,
+        "sprint": "LP Sprint 41",
+        "story_points": 2,
+        "progress_percent": null,
+        "issuelinks": [],
+        "comment": {
+          "comments": []
+        },
+        "workradar": {
+          "item_id": "wr-131",
+          "project": "live",
+          "learners": 0,
+          "revenue": false,
+          "escalation": false,
+          "snoozed_minutes_from_now": null
+        }
+      }
+    },
+    {
+      "key": "LP-520",
+      "self": "https://jira.example.com/browse/LP-520",
+      "fields": {
+        "summary": "Leaderboard shows the previous cohort for some learners",
+        "description": "The leaderboard query uses the learner’s first cohort instead of their active one.",
+        "issuetype": {
+          "name": "Bug"
+        },
+        "priority": {
+          "name": "P2"
+        },
+        "status": {
+          "name": "In Progress"
+        },
+        "assignee": {
+          "id": "vikram",
+          "name": "Vikram Rao",
+          "email": "vikram@airtribe.example",
+          "slack_id": "UVIKRAM",
+          "github_login": "vikram-airtribe"
+        },
+        "reporter": {
+          "id": "priya",
+          "name": "Priya Menon",
+          "email": "priya@airtribe.example",
+          "slack_id": "UPRIYA",
+          "github_login": "priya-airtribe"
+        },
+        "labels": [],
+        "created_minutes_ago": 2000,
+        "updated_minutes_ago": 300,
+        "resolved_minutes_ago": null,
+        "duedate_minutes_from_now": 4305,
+        "due_label": null,
+        "sprint": "LP Sprint 41",
+        "story_points": 2,
+        "progress_percent": null,
+        "issuelinks": [],
+        "comment": {
+          "comments": []
+        },
+        "workradar": {
+          "item_id": "wr-141",
+          "project": "review",
+          "learners": 35,
+          "revenue": false,
+          "escalation": false,
+          "snoozed_minutes_from_now": null
+        }
+      }
+    },
+    {
+      "key": "LP-514",
+      "self": "https://jira.example.com/browse/LP-514",
+      "fields": {
+        "summary": "AI feedback panel overlaps the rubric on small screens",
+        "description": "Below 380 px width the feedback panel covers the rubric.",
+        "issuetype": {
+          "name": "Bug"
+        },
+        "priority": {
+          "name": "P2"
+        },
+        "status": {
+          "name": "To Do"
+        },
+        "assignee": {
+          "id": "rahul",
+          "name": "Rahul Verma",
+          "email": "rahul@airtribe.example",
+          "slack_id": "URAHUL",
+          "github_login": "rahul-airtribe"
+        },
+        "reporter": {
+          "id": "sneha",
+          "name": "Sneha Reddy",
+          "email": "sneha@airtribe.example",
+          "slack_id": "USNEHA",
+          "github_login": "sneha-airtribe"
+        },
+        "labels": [],
+        "created_minutes_ago": 200,
+        "updated_minutes_ago": 200,
+        "resolved_minutes_ago": null,
+        "duedate_minutes_from_now": 5805,
+        "due_label": null,
+        "sprint": "LP Sprint 41",
+        "story_points": 1,
+        "progress_percent": null,
+        "issuelinks": [],
+        "comment": {
+          "comments": []
+        },
+        "workradar": {
+          "item_id": "wr-114",
+          "project": "review",
+          "learners": 0,
+          "revenue": false,
+          "escalation": false,
+          "snoozed_minutes_from_now": null
+        }
+      }
+    },
+    {
+      "key": "LP-515",
+      "self": "https://jira.example.com/browse/LP-515",
+      "fields": {
+        "summary": "“Regenerate feedback” can be submitted twice",
+        "description": "Button isn’t disabled while the request is in flight.",
+        "issuetype": {
+          "name": "Bug"
+        },
+        "priority": {
+          "name": "P2"
+        },
+        "status": {
+          "name": "To Do"
+        },
+        "assignee": {
+          "id": "ananya",
+          "name": "Ananya Iyer",
+          "email": "ananya@airtribe.example",
+          "slack_id": "UANANYA",
+          "github_login": "ananya-airtribe"
+        },
+        "reporter": {
+          "id": "sneha",
+          "name": "Sneha Reddy",
+          "email": "sneha@airtribe.example",
+          "slack_id": "USNEHA",
+          "github_login": "sneha-airtribe"
+        },
+        "labels": [],
+        "created_minutes_ago": 200,
+        "updated_minutes_ago": 200,
+        "resolved_minutes_ago": null,
+        "duedate_minutes_from_now": 5805,
+        "due_label": null,
+        "sprint": "LP Sprint 41",
+        "story_points": 1,
+        "progress_percent": null,
+        "issuelinks": [],
+        "comment": {
+          "comments": []
+        },
+        "workradar": {
+          "item_id": "wr-115",
+          "project": "review",
+          "learners": 0,
+          "revenue": false,
+          "escalation": false,
+          "snoozed_minutes_from_now": null
+        }
+      }
+    },
+    {
+      "key": "LP-516",
+      "self": "https://jira.example.com/browse/LP-516",
+      "fields": {
+        "summary": "Typo in the rubric tooltip",
+        "description": "“Prioritisation” is spelled two ways in the same tooltip.",
+        "issuetype": {
+          "name": "Bug"
+        },
+        "priority": {
+          "name": "P3"
+        },
+        "status": {
+          "name": "To Do"
+        },
+        "assignee": {
+          "id": "meera",
+          "name": "Meera Joshi",
+          "email": "meera@airtribe.example",
+          "slack_id": "UMEERA",
+          "github_login": "meera-airtribe"
+        },
+        "reporter": {
+          "id": "sneha",
+          "name": "Sneha Reddy",
+          "email": "sneha@airtribe.example",
+          "slack_id": "USNEHA",
+          "github_login": "sneha-airtribe"
+        },
+        "labels": [],
+        "created_minutes_ago": 200,
+        "updated_minutes_ago": 200,
+        "resolved_minutes_ago": null,
+        "duedate_minutes_from_now": null,
+        "due_label": null,
+        "sprint": "LP Sprint 41",
+        "story_points": null,
+        "progress_percent": null,
+        "issuelinks": [],
+        "comment": {
+          "comments": []
+        },
+        "workradar": {
+          "item_id": "wr-116",
+          "project": "review",
+          "learners": 0,
+          "revenue": false,
+          "escalation": false,
+          "snoozed_minutes_from_now": null
+        }
+      }
+    },
+    {
+      "key": "LP-508",
+      "self": "https://jira.example.com/browse/LP-508",
+      "fields": {
+        "summary": "Resume builder: export to PDF",
+        "description": "Learners can export their resume as a PDF using the Airtribe template.",
+        "issuetype": {
+          "name": "Story"
+        },
+        "priority": {
+          "name": "P2"
+        },
+        "status": {
+          "name": "In Progress"
+        },
+        "assignee": {
+          "id": "rahul",
+          "name": "Rahul Verma",
+          "email": "rahul@airtribe.example",
+          "slack_id": "URAHUL",
+          "github_login": "rahul-airtribe"
+        },
+        "reporter": {
+          "id": "meera",
+          "name": "Meera Joshi",
+          "email": "meera@airtribe.example",
+          "slack_id": "UMEERA",
+          "github_login": "meera-airtribe"
+        },
+        "labels": [],
+        "created_minutes_ago": 6000,
+        "updated_minutes_ago": 350,
+        "resolved_minutes_ago": null,
+        "duedate_minutes_from_now": 4305,
+        "due_label": null,
+        "sprint": "LP Sprint 41",
+        "story_points": 3,
+        "progress_percent": 70,
+        "issuelinks": [],
+        "comment": {
+          "comments": []
+        },
+        "workradar": {
+          "item_id": "wr-121",
+          "project": "career",
+          "learners": 0,
+          "revenue": false,
+          "escalation": false,
+          "snoozed_minutes_from_now": null
+        }
+      }
+    },
+    {
+      "key": "LP-495",
+      "self": "https://jira.example.com/browse/LP-495",
+      "fields": {
+        "summary": "GenAI Launchpad enrollment flow",
+        "description": "Everything needed for learners to discover, pay for and join GenAI Launchpad.",
+        "issuetype": {
+          "name": "Epic"
+        },
+        "priority": {
+          "name": "P1"
+        },
+        "status": {
+          "name": "In Progress"
+        },
+        "assignee": {
+          "id": "karan",
+          "name": "Karan Mehta",
+          "email": "karan@airtribe.example",
+          "slack_id": "UKARAN",
+          "github_login": "karan-airtribe"
+        },
+        "reporter": {
+          "id": "rohan",
+          "name": "Rohan Bhatia",
+          "email": "rohan@airtribe.example",
+          "slack_id": "UROHAN",
+          "github_login": "rohan-airtribe"
+        },
+        "labels": [],
+        "created_minutes_ago": 20000,
+        "updated_minutes_ago": 700,
+        "resolved_minutes_ago": null,
+        "duedate_minutes_from_now": 10080,
+        "due_label": "Enrollments open",
+        "sprint": null,
+        "story_points": null,
+        "progress_percent": 80,
+        "issuelinks": [],
+        "comment": {
+          "comments": []
+        },
+        "workradar": {
+          "item_id": "wr-135",
+          "project": "launchpad",
+          "learners": 0,
+          "revenue": true,
+          "escalation": false,
+          "snoozed_minutes_from_now": null
+        }
+      }
+    },
+    {
+      "key": "LP-503",
+      "self": "https://jira.example.com/browse/LP-503",
+      "fields": {
+        "summary": "Rotate video provider API keys before Oct 31",
+        "description": "Quarterly key rotation for the video provider.",
+        "issuetype": {
+          "name": "Task"
+        },
+        "priority": {
+          "name": "P3"
+        },
+        "status": {
+          "name": "To Do"
+        },
+        "assignee": {
+          "id": "arjun",
+          "name": "Arjun Nair",
+          "email": "arjun@airtribe.example",
+          "slack_id": "UARJUN",
+          "github_login": "arjun-airtribe"
+        },
+        "reporter": {
+          "id": "arjun",
+          "name": "Arjun Nair",
+          "email": "arjun@airtribe.example",
+          "slack_id": "UARJUN",
+          "github_login": "arjun-airtribe"
+        },
+        "labels": [],
+        "created_minutes_ago": 9000,
+        "updated_minutes_ago": 9000,
+        "resolved_minutes_ago": null,
+        "duedate_minutes_from_now": 25005,
+        "due_label": null,
+        "sprint": null,
+        "story_points": null,
+        "progress_percent": null,
+        "issuelinks": [],
+        "comment": {
+          "comments": []
+        },
+        "workradar": {
+          "item_id": "wr-143",
+          "project": "platform",
+          "learners": 0,
+          "revenue": false,
+          "escalation": false,
+          "snoozed_minutes_from_now": null
+        }
+      }
+    },
+    {
+      "key": "LP-522",
+      "self": "https://jira.example.com/browse/LP-522",
+      "fields": {
+        "summary": "Let mentors add notes after a doubt-solving session",
+        "description": "Mentors want a short notes field after each session, visible to the learner.",
+        "issuetype": {
+          "name": "Story"
+        },
+        "priority": {
+          "name": "P3"
+        },
+        "status": {
+          "name": "To Do"
+        },
+        "assignee": null,
+        "reporter": {
+          "id": "ishita",
+          "name": "Ishita Das",
+          "email": "ishita@airtribe.example",
+          "slack_id": "UISHITA",
+          "github_login": "ishita-airtribe"
+        },
+        "labels": [],
+        "created_minutes_ago": 3000,
+        "updated_minutes_ago": 3000,
+        "resolved_minutes_ago": null,
+        "duedate_minutes_from_now": null,
+        "due_label": null,
+        "sprint": null,
+        "story_points": null,
+        "progress_percent": null,
+        "issuelinks": [],
+        "comment": {
+          "comments": []
+        },
+        "workradar": {
+          "item_id": "wr-150",
+          "project": "mentor",
+          "learners": 0,
+          "revenue": false,
+          "escalation": false,
+          "snoozed_minutes_from_now": null
+        }
+      }
+    },
+    {
+      "key": "LP-509",
+      "self": "https://jira.example.com/browse/LP-509",
+      "fields": {
+        "summary": "Upgrade the CI runners to the new image",
+        "description": "Move CI to the new base image to cut build times.",
+        "issuetype": {
+          "name": "Task"
+        },
+        "priority": {
+          "name": "P3"
+        },
+        "status": {
+          "name": "To Do"
+        },
+        "assignee": {
+          "id": "arjun",
+          "name": "Arjun Nair",
+          "email": "arjun@airtribe.example",
+          "slack_id": "UARJUN",
+          "github_login": "arjun-airtribe"
+        },
+        "reporter": {
+          "id": "arjun",
+          "name": "Arjun Nair",
+          "email": "arjun@airtribe.example",
+          "slack_id": "UARJUN",
+          "github_login": "arjun-airtribe"
+        },
+        "labels": [],
+        "created_minutes_ago": 9000,
+        "updated_minutes_ago": 4000,
+        "resolved_minutes_ago": null,
+        "duedate_minutes_from_now": null,
+        "due_label": null,
+        "sprint": null,
+        "story_points": null,
+        "progress_percent": null,
+        "issuelinks": [],
+        "comment": {
+          "comments": []
+        },
+        "workradar": {
+          "item_id": "wr-126s",
+          "project": "platform",
+          "learners": 0,
+          "revenue": false,
+          "escalation": false,
+          "snoozed_minutes_from_now": 7200
+        }
+      }
+    },
+    {
+      "key": "LP-510",
+      "self": "https://jira.example.com/browse/LP-510",
+      "fields": {
+        "summary": "Certificate generator v2",
+        "description": "New certificate layout with verification link.",
+        "issuetype": {
+          "name": "Story"
+        },
+        "priority": {
+          "name": "P2"
+        },
+        "status": {
+          "name": "Done"
+        },
+        "assignee": {
+          "id": "rahul",
+          "name": "Rahul Verma",
+          "email": "rahul@airtribe.example",
+          "slack_id": "URAHUL",
+          "github_login": "rahul-airtribe"
+        },
+        "reporter": {
+          "id": "meera",
+          "name": "Meera Joshi",
+          "email": "meera@airtribe.example",
+          "slack_id": "UMEERA",
+          "github_login": "meera-airtribe"
+        },
+        "labels": [],
+        "created_minutes_ago": 12000,
+        "updated_minutes_ago": 130,
+        "resolved_minutes_ago": 130,
+        "duedate_minutes_from_now": null,
+        "due_label": null,
+        "sprint": "LP Sprint 41",
+        "story_points": 5,
+        "progress_percent": 100,
+        "issuelinks": [],
+        "comment": {
+          "comments": []
+        },
+        "workradar": {
+          "item_id": "wr-125",
+          "project": "career",
+          "learners": 0,
+          "revenue": false,
+          "escalation": false,
+          "snoozed_minutes_from_now": null
+        }
+      }
+    },
+    {
+      "key": "LP-511",
+      "self": "https://jira.example.com/browse/LP-511",
+      "fields": {
+        "summary": "Fix leaderboard caching",
+        "description": "Leaderboard cache was never invalidated after grading.",
+        "issuetype": {
+          "name": "Bug"
+        },
+        "priority": {
+          "name": "P2"
+        },
+        "status": {
+          "name": "Done"
+        },
+        "assignee": {
+          "id": "vikram",
+          "name": "Vikram Rao",
+          "email": "vikram@airtribe.example",
+          "slack_id": "UVIKRAM",
+          "github_login": "vikram-airtribe"
+        },
+        "reporter": {
+          "id": "vikram",
+          "name": "Vikram Rao",
+          "email": "vikram@airtribe.example",
+          "slack_id": "UVIKRAM",
+          "github_login": "vikram-airtribe"
+        },
+        "labels": [],
+        "created_minutes_ago": 5000,
+        "updated_minutes_ago": 200,
+        "resolved_minutes_ago": 200,
+        "duedate_minutes_from_now": null,
+        "due_label": null,
+        "sprint": "LP Sprint 41",
+        "story_points": 2,
+        "progress_percent": 100,
+        "issuelinks": [],
+        "comment": {
+          "comments": []
+        },
+        "workradar": {
+          "item_id": "wr-127",
+          "project": "review",
+          "learners": 0,
+          "revenue": false,
+          "escalation": false,
+          "snoozed_minutes_from_now": null
+        }
+      }
+    }
+  ]
+}

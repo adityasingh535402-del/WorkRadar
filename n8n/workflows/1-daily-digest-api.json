@@ -1,0 +1,269 @@
+{
+  "name": "WorkRadar · 1 · Daily digest API",
+  "nodes": [
+    {
+      "id": "0101a2c8-dbdc-5f39-aad8-5a90e9537d14",
+      "name": "About this workflow",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -340
+      ],
+      "parameters": {
+        "content": "## WorkRadar · Daily digest\nThe WorkRadar app POSTs a ranked snapshot of the team's work here. Gemini writes the brief: **top work for today, what happened, what needs attention, who is blocked**.\n\n1. Open **Gemini: write the brief** and pick your Gemini credential.\n2. Publish / activate the workflow.\n3. Paste the **Production URL** of *Digest request* into WorkRadar → Settings.\n\nIf Gemini fails, a rule-based fallback answers so the app never breaks.",
+        "width": 420,
+        "height": 300,
+        "color": 4
+      }
+    },
+    {
+      "id": "ac711341-c09a-5e6a-aa3a-6769b01fde9d",
+      "name": "Change the model",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        400,
+        -220
+      ],
+      "parameters": {
+        "content": "### Model\nEdit **Config** to switch models. Default `gemini-3.8-flash`; `gemini-3.5-flash-lite` is lighter if you hit free-tier limits.",
+        "width": 300,
+        "height": 160,
+        "color": 7
+      }
+    },
+    {
+      "id": "371bdd71-dad6-5d77-a5e1-18743003dbd5",
+      "name": "Digest request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "workradar/digest",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "webhookId": "d89d5d1d-e260-5c5e-af3c-5cd62e975d6e"
+    },
+    {
+      "id": "7781f31b-6bb7-5146-ac14-a16d5207f841",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        0
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5398eb74-5f35-5e9d-a27d-97f860f49965",
+              "name": "model",
+              "value": "gemini-3.8-flash",
+              "type": "string"
+            },
+            {
+              "id": "0f42b6d4-f14f-5d5e-a36f-f61ed7fdc3c1",
+              "name": "fallbackModel",
+              "value": "gemini-3.5-flash-lite",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "8d2d258f-6735-5b73-aaeb-bd3fef430ce2",
+      "name": "Build Gemini request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// n8n Code node · \"Build Gemini request\" (Run once for all items)\n// Turns the WorkRadar snapshot posted by the app into a Gemini generateContent request.\n// If the workflow is run from the editor without a body, a small sample snapshot is used.\n\nconst SYSTEM_PROMPT = \"You are WorkRadar, a chief-of-staff assistant for an engineering manager.\\nYou receive a JSON snapshot of their team's work from Slack, Jira, GitHub and email.\\nItems are already ranked by a transparent priority score (0-100) and grouped into rings:\\n\\\"now\\\" (needs attention now), \\\"today\\\" and \\\"later\\\".\\n\\nWrite the manager's brief as JSON that matches the response schema.\\n\\nRules\\n- Use only facts in the snapshot. Never invent people, numbers, deadlines or items.\\n- Put the exact item \\\"id\\\" from the snapshot in every itemId field. Use team member ids for personId.\\n- Plain, specific language. No hype, no emojis, no exclamation marks.\\n- Each \\\"why\\\", \\\"action\\\" and \\\"suggestion\\\" is one sentence under 25 words.\\n\\nFields\\n- headline: 1-2 sentences. How many items need attention, how many people are blocked (and how many on the manager), and the one thing to start with and why.\\n- topWork: exactly 3 items the manager should personally act on today, most important first. Prefer items waiting on the manager, P0/P1 items, and items that unblock teammates. \\\"why\\\" is the concrete next step.\\n- happened: up to 6 notable events from happenedToday as short past-tense sentences. Keep itemId and at when present.\\n- attention: every item in ring \\\"now\\\" (max 6), with why it matters now and the action to take.\\n- blocked: one entry per blocked person with personId, itemId, blockedOn (what they are waiting for), since (the blockedFor value) and suggestion (how the manager can unblock them).\";\nconst RESPONSE_SCHEMA = {\n  \"type\": \"OBJECT\",\n  \"properties\": {\n    \"headline\": {\n      \"type\": \"STRING\"\n    },\n    \"topWork\": {\n      \"type\": \"ARRAY\",\n      \"items\": {\n        \"type\": \"OBJECT\",\n        \"properties\": {\n          \"itemId\": {\n            \"type\": \"STRING\"\n          },\n          \"why\": {\n            \"type\": \"STRING\"\n          }\n        },\n        \"required\": [\n          \"itemId\",\n          \"why\"\n        ]\n      }\n    },\n    \"happened\": {\n      \"type\": \"ARRAY\",\n      \"items\": {\n        \"type\": \"OBJECT\",\n        \"properties\": {\n          \"text\": {\n            \"type\": \"STRING\"\n          },\n          \"itemId\": {\n            \"type\": \"STRING\"\n          },\n          \"at\": {\n            \"type\": \"STRING\"\n          }\n        },\n        \"required\": [\n          \"text\"\n        ]\n      }\n    },\n    \"attention\": {\n      \"type\": \"ARRAY\",\n      \"items\": {\n        \"type\": \"OBJECT\",\n        \"properties\": {\n          \"itemId\": {\n            \"type\": \"STRING\"\n          },\n          \"why\": {\n            \"type\": \"STRING\"\n          },\n          \"action\": {\n            \"type\": \"STRING\"\n          }\n        },\n        \"required\": [\n          \"itemId\",\n          \"why\",\n          \"action\"\n        ]\n      }\n    },\n    \"blocked\": {\n      \"type\": \"ARRAY\",\n      \"items\": {\n        \"type\": \"OBJECT\",\n        \"properties\": {\n          \"personId\": {\n            \"type\": \"STRING\"\n          },\n          \"itemId\": {\n            \"type\": \"STRING\"\n          },\n          \"blockedOn\": {\n            \"type\": \"STRING\"\n          },\n          \"since\": {\n            \"type\": \"STRING\"\n          },\n          \"suggestion\": {\n            \"type\": \"STRING\"\n          }\n        },\n        \"required\": [\n          \"personId\",\n          \"blockedOn\",\n          \"suggestion\"\n        ]\n      }\n    }\n  },\n  \"required\": [\n    \"headline\",\n    \"topWork\",\n    \"happened\",\n    \"attention\",\n    \"blocked\"\n  ]\n};\nconst SAMPLE_SNAPSHOT = {\n  \"manager\": {\n    \"name\": \"Neha Kapoor\",\n    \"role\": \"Engineering Manager\",\n    \"team\": \"Learning Platform\",\n    \"company\": \"Airtribe\"\n  },\n  \"now\": \"2026-10-13T06:00:00.000Z\",\n  \"timezone\": \"Asia/Kolkata\",\n  \"team\": [\n    {\n      \"id\": \"neha\",\n      \"name\": \"Neha Kapoor\",\n      \"role\": \"Engineering Manager\"\n    },\n    {\n      \"id\": \"rahul\",\n      \"name\": \"Rahul Verma\",\n      \"role\": \"Senior Frontend Engineer\"\n    },\n    {\n      \"id\": \"ananya\",\n      \"name\": \"Ananya Iyer\",\n      \"role\": \"Backend Engineer\"\n    },\n    {\n      \"id\": \"karan\",\n      \"name\": \"Karan Mehta\",\n      \"role\": \"Full-stack Engineer\"\n    },\n    {\n      \"id\": \"sneha\",\n      \"name\": \"Sneha Reddy\",\n      \"role\": \"QA Engineer\"\n    },\n    {\n      \"id\": \"arjun\",\n      \"name\": \"Arjun Nair\",\n      \"role\": \"Platform Engineer\"\n    },\n    {\n      \"id\": \"meera\",\n      \"name\": \"Meera Joshi\",\n      \"role\": \"Product Designer\"\n    },\n    {\n      \"id\": \"vikram\",\n      \"name\": \"Vikram Rao\",\n      \"role\": \"Data Engineer\"\n    },\n    {\n      \"id\": \"ishita\",\n      \"name\": \"Ishita Das\",\n      \"role\": \"Program Manager\"\n    }\n  ],\n  \"openItems\": [\n    {\n      \"id\": \"wr-101\",\n      \"source\": \"slack\",\n      \"ref\": \"#incidents\",\n      \"title\": \"Learners on iPhone can’t join live sessions\",\n      \"summary\": \"Blank screen after Join on iOS since the video SDK upgrade; 23 tickets; class starts in about 5 hours.\",\n      \"status\": \"in_progress\",\n      \"priority\": \"P0\",\n      \"assignee\": \"Karan Mehta\",\n      \"due\": \"in 5h\",\n      \"score\": 97,\n      \"ring\": \"now\",\n      \"why\": \"Live P0 incident, pinned to the top. Live class starts in 5h\",\n      \"blockedBy\": null,\n      \"waitingOnManager\": true,\n      \"suggestedNextStep\": \"Approve the canary rollback now.\"\n    },\n    {\n      \"id\": \"wr-102\",\n      \"source\": \"github\",\n      \"ref\": \"PR #1284\",\n      \"title\": \"Fix race condition in grade sync for re-submitted assignments\",\n      \"summary\": \"Checks green; your review requested 26 hours ago; LP-498 waits on it.\",\n      \"status\": \"in_review\",\n      \"priority\": null,\n      \"assignee\": \"Ananya Iyer\",\n      \"due\": \"Tomorrow\",\n      \"score\": 93,\n      \"ring\": \"now\",\n      \"why\": \"Mentor review window opens within a day. Ananya is waiting on you\",\n      \"blockedBy\": null,\n      \"waitingOnManager\": true,\n      \"suggestedNextStep\": \"Review it now; 180 lines.\"\n    },\n    {\n      \"id\": \"wr-103\",\n      \"source\": \"jira\",\n      \"ref\": \"LP-512\",\n      \"title\": \"Payment webhook retries fail for GenAI Launchpad enrollments\",\n      \"summary\": \"14 learners paid but not enrolled; unassigned.\",\n      \"status\": \"open\",\n      \"priority\": \"P1\",\n      \"assignee\": null,\n      \"due\": \"in 4h\",\n      \"score\": 86,\n      \"ring\": \"now\",\n      \"why\": \"Needed before go/no-go in 4h. P1, 14 learners affected\",\n      \"blockedBy\": null,\n      \"waitingOnManager\": false,\n      \"suggestedNextStep\": \"Assign to Arjun.\"\n    }\n  ],\n  \"blockedPeople\": [\n    {\n      \"person\": \"Ananya Iyer\",\n      \"personId\": \"ananya\",\n      \"itemId\": \"wr-106\",\n      \"ref\": \"LP-498\",\n      \"blockedOn\": \"Waiting on your review of PR #1284\",\n      \"blockedFor\": \"26h\",\n      \"blockedByManager\": true\n    }\n  ],\n  \"happenedToday\": [\n    {\n      \"text\": \"v3.14.0 deployed to production\",\n      \"itemId\": \"wr-112\",\n      \"at\": \"2026-10-13T04:00:00.000Z\"\n    }\n  ]\n};\n\nconst body = $('Digest request').first().json.body || {};\nconst snapshot = Array.isArray(body.openItems) && body.openItems.length ? body : SAMPLE_SNAPSHOT;\nconst config = $('Config').first().json;\n\nreturn [\n  {\n    json: {\n      model: config.model,\n      fallbackModel: config.fallbackModel,\n      usedSample: snapshot === SAMPLE_SNAPSHOT,\n      snapshot,\n      request: {\n        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },\n        contents: [{ role: 'user', parts: [{ text: 'Snapshot:\\n' + JSON.stringify(snapshot) }] }],\n        generationConfig: { temperature: 0.3, responseMimeType: 'application/json', responseSchema: RESPONSE_SCHEMA },\n      },\n    },\n  },\n];\n"
+      }
+    },
+    {
+      "id": "a7cccddd-3d57-52e2-a105-ef2a78f4165b",
+      "name": "Gemini: write the brief",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $json.model }}:generateContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.request) }}",
+        "options": {
+          "timeout": 45000
+        }
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "workradar-gemini",
+          "name": "Gemini – WorkRadar"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 3000,
+      "onError": "continueErrorOutput",
+      "notesInFlow": true,
+      "notes": "Select your “Gemini – WorkRadar” credential here"
+    },
+    {
+      "id": "84029aaf-417f-558d-a066-40d0c362ab12",
+      "name": "Validate brief",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        980,
+        -100
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// n8n Code node · \"Validate brief\" (Run once for all items)\n// Parses Gemini's JSON, drops anything that doesn't point at a real item or person,\n// and shapes the response the WorkRadar app expects: { brief, engine, model }.\n\nconst req = $('Build Gemini request').first().json;\nconst res = $input.first().json;\nconst parts = (res.candidates && res.candidates[0] && res.candidates[0].content && res.candidates[0].content.parts) || [];\nconst text = parts.filter((p) => !p.thought && p.text).map((p) => p.text).join('');\n\nlet brief;\ntry {\n  brief = JSON.parse(text);\n} catch (e) {\n  throw new Error('Gemini did not return valid JSON: ' + text.slice(0, 200));\n}\n\nconst ids = new Set(req.snapshot.openItems.map((i) => i.id).concat((req.snapshot.happenedToday || []).map((h) => h.itemId).filter(Boolean)));\nconst people = new Set((req.snapshot.team || []).map((p) => p.id));\nconst str = (v) => (typeof v === 'string' ? v.trim() : '');\nconst list = (v) => (Array.isArray(v) ? v : []);\n\nconst clean = {\n  headline: str(brief.headline),\n  topWork: list(brief.topWork).filter((x) => ids.has(x.itemId) && str(x.why)).slice(0, 3),\n  happened: list(brief.happened).filter((x) => str(x.text)).slice(0, 6),\n  attention: list(brief.attention).filter((x) => ids.has(x.itemId) && str(x.why)).slice(0, 6),\n  blocked: list(brief.blocked).filter((x) => (people.size === 0 || people.has(x.personId)) && str(x.blockedOn)),\n};\nif (!clean.headline) throw new Error('Gemini response had no headline');\n\nreturn [{ json: { brief: clean, engine: 'n8n', model: req.model, usedSample: req.usedSample, generatedAt: new Date().toISOString() } }];\n"
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "4b844b2a-4095-59e1-a49a-d2373a57e1cc",
+      "name": "Rule-based fallback",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        980,
+        140
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// n8n Code node · \"Rule-based fallback\" (Run once for all items)\n// Runs when the Gemini call fails (no credential, quota, network). Builds the same\n// brief shape from the ranked snapshot so the app always gets an answer.\n\nconst req = $('Build Gemini request').first().json;\nconst s = req.snapshot;\nconst open = s.openItems || [];\nconst now = open.filter((i) => i.ring === 'now');\nconst blocked = s.blockedPeople || [];\nconst onYou = blocked.filter((b) => b.blockedByManager).length;\nconst first = (name) => String(name || '').split(' ')[0];\n\nlet headline = now.length\n  ? `${now.length} ${now.length === 1 ? 'item needs' : 'items need'} your attention`\n  : 'Nothing needs you urgently right now';\nheadline += blocked.length ? `, and ${blocked.length} ${blocked.length === 1 ? 'person is' : 'people are'} blocked${onYou ? ` (${onYou} on you)` : ''}.` : '.';\nif (open[0] && open[0].ring === 'now') headline += ` Start with ${open[0].ref}: ${String(open[0].why).split('. ')[0]}.`;\n\nconst brief = {\n  headline,\n  topWork: open.slice(0, 3).map((i) => ({ itemId: i.id, why: i.suggestedNextStep || i.why })),\n  happened: (s.happenedToday || []).slice(0, 6),\n  attention: now.slice(0, 6).map((i) => ({ itemId: i.id, why: i.why, action: i.suggestedNextStep || 'Open it and decide the next step.' })),\n  blocked: blocked.map((b) => ({\n    personId: b.personId,\n    itemId: b.itemId,\n    blockedOn: b.blockedOn,\n    since: b.blockedFor,\n    suggestion: b.blockedByManager ? `Unblock ${first(b.person)} by acting on ${b.ref} yourself.` : `Check what ${first(b.person)} needs to move ${b.ref}.`,\n  })),\n};\n\nconst err = $input.first().json.error;\nreturn [{ json: { brief, engine: 'n8n', model: 'rule-based fallback', fallbackReason: err ? String(err.message || err) : 'Gemini unavailable', generatedAt: new Date().toISOString() } }];\n"
+      }
+    },
+    {
+      "id": "eefe1bf4-f33d-5cdf-a1e3-31215716d833",
+      "name": "Send brief to WorkRadar",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1240,
+        0
+      ],
+      "parameters": {
+        "respondWith": "firstIncomingItem",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Digest request": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Build Gemini request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Gemini request": {
+      "main": [
+        [
+          {
+            "node": "Gemini: write the brief",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini: write the brief": {
+      "main": [
+        [
+          {
+            "node": "Validate brief",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Rule-based fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate brief": {
+      "main": [
+        [
+          {
+            "node": "Send brief to WorkRadar",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Rule-based fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rule-based fallback": {
+      "main": [
+        [
+          {
+            "node": "Send brief to WorkRadar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Kolkata",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "active": false,
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}

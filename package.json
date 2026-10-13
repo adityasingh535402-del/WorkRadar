@@ -1,0 +1,29 @@
+{
+  "name": "workradar",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "WorkRadar: one AI-ranked view of your team's work across Slack, Jira, GitHub and email.",
+  "author": "Aditya Singh",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.4.1",
+    "typescript": "~5.8.3",
+    "vite": "^6.3.5"
+  },
+  "engines": {
+    "node": ">=18.18"
+  }
+}
