@@ -105,6 +105,9 @@ Stack: React 18, TypeScript, Vite, hand-written CSS (no UI framework), Vercel Ed
 
 - [Product Requirements Document (PDF)](docs/WorkRadar-PRD.pdf)
 - [AI Workflow Document (PDF)](docs/WorkRadar-AI-Workflow.pdf)
+- [Demo script](docs/DEMO-SCRIPT.md)
+
+The PDFs are generated from `docs/src/*.html` with `python3 docs/src/build.py`.
 
 ## Credits
 
