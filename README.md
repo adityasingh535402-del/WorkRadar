@@ -57,7 +57,7 @@ flowchart LR
 - **Ranking is deterministic and explainable.** Six weighted signals (urgency, impact, unblocks others, waiting on you, stuck, escalation) produce the score, and every item shows why. P0 incidents are pinned to the top. Weights are adjustable in Settings.
 - **AI writes; it doesn’t rank.** Gemini turns the ranked snapshot into the brief: headline, top three for today, what happened, needs attention, and who’s blocked with a suggested unblock. Output is constrained by a JSON schema and validated, so any item ID the model invents is dropped.
 - **Fast by default.** Flash-Lite answers in about 2 seconds. Flash, which reasons more but took over 35 seconds in testing, is the fallback. The route streams its response, so a slow model never hits the platform’s time limit.
-- **It never comes up empty.** If Gemini fails, the app shows an on-device summary of the same data, says why, and offers a retry. The brief is always labelled with the engine that wrote it.
+- **It never comes up empty.** An on-device summary appears instantly and Gemini’s brief replaces it when it arrives, which matters when Gemini is under load. If Gemini fails, the summary stays, with the reason and a retry. The brief is always labelled with the engine that wrote it.
 
 ## Run it locally
 

@@ -136,7 +136,7 @@
         <div class="lbl">Manager</div>
         <div class="box dark"><b>WorkRadar app</b>Today, Priority feed, Item detail, Search, Team. Every score shows “why”.</div>
         <div class="box det"><b>Validation</b>Drops unknown item IDs, resolves people, caps lists, rejects briefs without a headline</div>
-        <div class="box det"><b>On-device summary</b>If Gemini fails: the same data summarised in the browser, the reason in plain words, and Try again</div>
+        <div class="box det"><b>On-device summary</b>Shown instantly while Gemini writes. If Gemini fails it stays, with the reason in plain words and Try again</div>
       </div>
     </div>
     <p class="small muted" style="margin-top:2mm">Green boxes use an LLM. Grey boxes are deterministic code. The split is deliberate: AI handles language, code handles ranking and anything that must be auditable.</p>
@@ -208,7 +208,7 @@ I want a full-fledged, functioning, visually aesthetic project, so use your best
         <tr><td>Validation</td><td>JSON schema output</td><td><span class="fix">Added <code>sanitizeBrief</code>: drops unknown item IDs, resolves names to people, caps list lengths, rejects briefs without a headline.</span></td></tr>
         <tr><td>Model choice</td><td>Gemini 3.8 Flash as the default</td><td><span class="fix">On the live site it took over 35 s and hit the platform’s response limit. Timed side by side, Flash-Lite answered in about 2 s, so it became the default and Flash the fallback.</span></td></tr>
         <tr><td>AI route</td><td>Server-side Gemini call</td><td><span class="fix">The route now streams, so slow answers aren’t cut off, and it falls back on timeouts, not just rate limits.</span><br><span class="fix">Added a same-origin check, an 80 KB payload cap and a 40-item cap. The key lives only in Vercel’s environment variables.</span></td></tr>
-        <tr><td>AI failures</td><td>Error passed straight to the UI</td><td><span class="fix">Raw text like “Gemini 503: …” reached the brief. Failures now show one plain sentence, the on-device summary and Try again.</span></td></tr>
+        <tr><td>AI failures</td><td>Error passed straight to the UI</td><td><span class="fix">Raw text like “Gemini 503: …” reached the brief. Failures now show one plain sentence, the on-device summary and Try again.</span><br><span class="fix">Under load Gemini slowed from 3 s to 30 s, so the on-device summary now fills the panel instantly while Gemini writes.</span></td></tr>
         <tr><td>Priority feed</td><td>Flight-strip rows, views, filters, keyboard triage</td><td><span class="fix">The default view was too sparse, so it is now “All open” with ring headers.</span><br><span class="fix">Item refs were truncated, so columns were widened and DM refs shortened. Keyboard hints moved to their own line.</span></td></tr>
         <tr><td>Empty states</td><td>First run, no results, nothing needs you</td><td><span class="fix">On first run, source icons stretched and the sidebar claimed sources had synced “2m ago”. Fixed to “Not connected”.</span></td></tr>
         <tr><td>Scope</td><td>A workflow-automation layer (n8n)</td><td><span class="fix">It was built because the brief mentioned n8n, which turned out to be a mistake in the brief. It was removed, leaving one moving part: the serverless AI route.</span></td></tr>
