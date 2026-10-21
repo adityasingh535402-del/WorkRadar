@@ -29,8 +29,8 @@
       "parameters": {}
     },
     {
-      "id": "598cb3a0-2972-5ba7-ac5b-c1112c379ede",
-      "name": "Every 15 minutes",
+      "id": "39b56cbf-c881-5b7b-a76c-c85df1d2d4f4",
+      "name": "Every hour",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [
@@ -41,8 +41,8 @@
         "rule": {
           "interval": [
             {
-              "field": "minutes",
-              "minutesInterval": 15
+              "field": "hours",
+              "hoursInterval": 1
             }
           ]
         }
@@ -357,7 +357,7 @@
         ]
       ]
     },
-    "Every 15 minutes": {
+    "Every hour": {
       "main": [
         [
           {

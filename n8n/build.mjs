@@ -137,7 +137,7 @@ const wf2 = workflow(
   [
     sticky('About this workflow', `## WorkRadar · Source ingestion\nPulls Slack threads, Jira issues, GitHub PRs and Gmail messages, **normalises** them into one WorkItem schema, asks **Gemini to triage** the unstructured ones (priority, waiting on you, blocked, next step) and **ranks** everything with the same transparent score as the app.\n\nDemo mode reads API-shaped mock files from the GitHub repo. To go live, replace each fetch node with the native Slack / Jira / GitHub / Gmail node.`, [-60, -420], 460, 300, 4),
     manual('Run now', [0, -120]),
-    { name: 'Every 15 minutes', type: 'n8n-nodes-base.scheduleTrigger', typeVersion: 1.2, position: [0, 40], parameters: { rule: { interval: [{ field: 'minutes', minutesInterval: 15 }] } } },
+    { name: 'Every hour', type: 'n8n-nodes-base.scheduleTrigger', typeVersion: 1.2, position: [0, 40], parameters: { rule: { interval: [{ field: 'hours', hoursInterval: 1 }] } } },
     webhook('Get items', 'GET', 'workradar/items', [0, 200]),
     setNode('Config', { sourceBaseUrl: SOURCE_BASE, model: DEFAULT_MODEL, managerId: 'neha', timezone: 'Asia/Kolkata' }, [260, 40]),
     httpGet('Slack: threads', '={{ $json.sourceBaseUrl }}/slack.json', [540, -200]),
@@ -168,7 +168,7 @@ const wf2 = workflow(
   ],
   [
     ['Run now', 'Config'],
-    ['Every 15 minutes', 'Config'],
+    ['Every hour', 'Config'],
     ['Get items', 'Config'],
     ['Config', 'Slack: threads'],
     ['Config', 'Jira: issues'],

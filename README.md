@@ -82,7 +82,7 @@ The key stays on the server: the browser only talks to `/api/digest`, which reje
 
 ## n8n
 
-Self-hosted n8n Community Edition runs the four workflows: digest API, source ingestion & ranking, item actions, and a morning brief to Slack. Setup takes about 15 minutes; see **[n8n/README.md](n8n/README.md)**.
+Four n8n workflows run the AI layer: digest API, source ingestion & ranking, item actions, and a morning brief to Slack. They run on n8n Cloud (recommended, nothing to install) or self-hosted with Docker. See **[n8n/README.md](n8n/README.md)**.
 
 ## Project structure
 
