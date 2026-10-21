@@ -26,7 +26,9 @@ async function postJson(url: string, body: unknown, timeoutMs: number) {
       throw new Error(msg);
     }
     if (!type.includes('json')) throw new Error('The service answered, but not with JSON.');
-    return (await res.json()) as Record<string, unknown>;
+    const data = (await res.json()) as Record<string, unknown>;
+    if (typeof data.error === 'string' && !data.brief) throw new Error(data.error);
+    return data;
   } catch (e) {
     if ((e as Error).name === 'AbortError') throw new Error(`No answer after ${Math.round(timeoutMs / 1000)} seconds.`);
     throw e;
@@ -100,7 +102,7 @@ export async function generateBrief(opts: { force?: boolean } = {}) {
 
   const attempts: { engine: Brief['engine']; url: string; timeout: number }[] = [];
   if (n8nDigestUrl) attempts.push({ engine: 'n8n', url: n8nDigestUrl, timeout: 45_000 });
-  if (aiMode === 'auto') attempts.push({ engine: 'gemini', url: './api/digest', timeout: 30_000 });
+  if (aiMode === 'auto') attempts.push({ engine: 'gemini', url: './api/digest', timeout: 120_000 });
 
   if (aiMode === 'n8n' && !n8nDigestUrl) {
     setBrief({ status: 'error', message: 'Add your n8n webhook URL in Settings to use n8n for the brief.', previous });
