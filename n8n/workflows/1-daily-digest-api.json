@@ -27,7 +27,7 @@
         -220
       ],
       "parameters": {
-        "content": "### Model\nEdit **Config** to switch models. Default `gemini-3.8-flash`; `gemini-3.5-flash-lite` is lighter if you hit free-tier limits.",
+        "content": "### Model\nEdit **Config** to switch models. Default `gemini-3.5-flash-lite` (fast). `gemini-3.8-flash` is used if it fails; it reasons more but is much slower.",
         "width": 300,
         "height": 160,
         "color": 7
@@ -67,13 +67,13 @@
             {
               "id": "5398eb74-5f35-5e9d-a27d-97f860f49965",
               "name": "model",
-              "value": "gemini-3.8-flash",
+              "value": "gemini-3.5-flash-lite",
               "type": "string"
             },
             {
               "id": "0f42b6d4-f14f-5d5e-a36f-f61ed7fdc3c1",
               "name": "fallbackModel",
-              "value": "gemini-3.5-flash-lite",
+              "value": "gemini-3.8-flash",
               "type": "string"
             }
           ]

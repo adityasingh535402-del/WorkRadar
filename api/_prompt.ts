@@ -68,5 +68,8 @@ export const RESPONSE_SCHEMA = {
   required: ['headline', 'topWork', 'happened', 'attention', 'blocked'],
 } as const;
 
-export const DEFAULT_MODEL = 'gemini-3.8-flash';
-export const FALLBACK_MODEL = 'gemini-3.5-flash-lite';
+// Flash-Lite answers in about 2 s with minimal thinking, which suits a summary of an
+// already-ranked snapshot. Gemini 3.8 Flash took over 35 s in testing (Oct 2026), so it
+// is the fallback for rate limits, not the default. Override with GEMINI_MODEL.
+export const DEFAULT_MODEL = 'gemini-3.5-flash-lite';
+export const FALLBACK_MODEL = 'gemini-3.8-flash';

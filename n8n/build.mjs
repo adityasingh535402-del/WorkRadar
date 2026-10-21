@@ -110,7 +110,7 @@ const wf1 = workflow(
   'WorkRadar · 1 · Daily digest API',
   [
     sticky('About this workflow', `## WorkRadar · Daily digest\nThe WorkRadar app POSTs a ranked snapshot of the team's work here. Gemini writes the brief: **top work for today, what happened, what needs attention, who is blocked**.\n\n1. Open **Gemini: write the brief** and pick your Gemini credential.\n2. Publish / activate the workflow.\n3. Paste the **Production URL** of *Digest request* into WorkRadar → Settings.\n\nIf Gemini fails, a rule-based fallback answers so the app never breaks.`, [-60, -340], 420, 300, 4),
-    sticky('Change the model', `### Model\nEdit **Config** to switch models. Default \`${DEFAULT_MODEL}\`; \`${FALLBACK_MODEL}\` is lighter if you hit free-tier limits.`, [400, -220], 300, 160, 7),
+    sticky('Change the model', `### Model\nEdit **Config** to switch models. Default \`${DEFAULT_MODEL}\` (fast). \`${FALLBACK_MODEL}\` is used if it fails; it reasons more but is much slower.`, [400, -220], 300, 160, 7),
     webhook('Digest request', 'POST', 'workradar/digest', [0, 0]),
     setNode('Config', { model: DEFAULT_MODEL, fallbackModel: FALLBACK_MODEL }, [240, 0]),
     codeNode('Build Gemini request', code('digest-build-request.js', { SYSTEM_PROMPT, RESPONSE_SCHEMA, SAMPLE_SNAPSHOT }), [480, 0]),
