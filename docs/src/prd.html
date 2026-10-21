@@ -26,8 +26,8 @@
     <div class="meta">
       <b>Aditya Singh</b><br>
       Airtribe · AI Product Management<br>
-      v1.0 · 13 October 2026<br>
-      Status: <b>MVP built, pilot-ready</b>
+      v1.1 · 21 October 2026<br>
+      Live: <b>work-radar-ten.vercel.app</b>
     </div>
   </header>
 
@@ -36,7 +36,7 @@
       <h2><span class="n">01</span>Problem statement</h2>
       <p>An engineering manager on Airtribe’s Learning Platform team starts every day by rebuilding the state of the team from four tools. The signals that matter are a P0 bug stopping learners from joining tonight’s live class, a designer blocked for two days, and a launch go/no-go waiting on the manager’s reply. They sit beside hundreds of FYIs and bot updates, and each tool marks priority differently, or not at all. Triage eats the first hour, blockers surface a day late, and escalations get missed.</p>
       <div class="quote">How might we give a manager one trustworthy, prioritised answer to “what needs me today?”, so they can act in five minutes instead of searching for an hour?</div>
-      <p class="muted small">WorkRadar ranks every item with a transparent score, uses AI to write the brief and triage unstructured threads, and lets the manager assign, finish or snooze work without switching tools.</p>
+      <p class="muted small">WorkRadar ranks every item with a transparent score, has Gemini turn the ranking into a daily brief, and lets the manager assign, finish or snooze work without switching tools.</p>
     </div>
     <div class="card dark">
       <h3>A manager’s day today <span class="muted small" style="color:#8fb4ad">(estimates to validate)</span></h3>
@@ -89,15 +89,15 @@
     <h2><span class="n">04</span>User journey: Neha’s Tuesday with WorkRadar</h2>
     <div class="journey">
       <div class="step">
-        <div class="t">08:45 · Slack</div><div class="rail"></div>
-        <h3>Gets the morning brief</h3>
-        <p>An n8n workflow posts a 5-line brief: 4 items need her, 4 people are blocked, start with the iPhone live-class bug.</p>
+        <div class="t">08:55 · Browser</div><div class="rail"></div>
+        <h3>Opens one tab</h3>
+        <p>WorkRadar is her start page. In about 2 seconds Gemini’s brief says 4 items need her, and to start with the iPhone live-class bug.</p>
         <div class="before">Before: opens 4 tools and 60+ tabs</div>
       </div>
       <div class="step">
         <div class="t">09:00 · Today</div><div class="rail"></div>
         <h3>Sees the whole radar</h3>
-        <p>Counts, a radar of 38 open items, an AI brief with the top 3 actions and what happened overnight.</p>
+        <p>Counts, a radar of 38 open items, the top 3 actions and what happened overnight, all on one screen.</p>
         <div class="before">Before: rebuilds the picture in her head</div>
       </div>
       <div class="step">
@@ -145,13 +145,13 @@
       <tbody>
         <tr class="ns"><td><span class="tag ns">North star</span> <strong>Time to clarity</strong></td><td class="tgt">&lt; 5 min</td><td>From an hour of triage to minutes</td><td>Session start → first action on a top-3 ranked item</td></tr>
         <tr><td><strong>Weekly active managers</strong> / invited</td><td class="tgt">≥ 70%</td><td>Habit and lasting value</td><td>Managers with ≥ 3 active days in the week</td></tr>
-        <tr><td><strong>Morning brief engagement</strong></td><td class="tgt">≥ 60% of days</td><td>The push drives the habit</td><td>Slack brief click-through, or Today opened by 10:00</td></tr>
+        <tr><td><strong>Morning check-in</strong></td><td class="tgt">≥ 60% of days</td><td>The daily habit is the product</td><td>Today opened before 10:00 on a workday</td></tr>
         <tr><td><strong>Blocker time to resolution</strong></td><td class="tgt">−30%</td><td>Highest-leverage manager action</td><td>Blocked flag → cleared, against a 4-week baseline</td></tr>
         <tr><td><strong>Actions taken in WorkRadar</strong></td><td class="tgt">≥ 5 / day</td><td>People act here, not just read</td><td>Assign, done and snooze per manager, net of undos</td></tr>
         <tr><td><strong>Ranking trust</strong></td><td class="tgt">≥ 80%</td><td>An untrusted radar gets ignored</td><td>Weekly “top 3 were right” pulse; re-rank rate &lt; 15%</td></tr>
         <tr><td><span class="tag guard">Guardrail</span> Missed P0/P1 escalations</td><td class="tgt">0</td><td>Costs learners and revenue</td><td>Every post-mortem checks it reached the inner ring</td></tr>
         <tr><td><span class="tag guard">Guardrail</span> AI factual errors</td><td class="tgt">&lt; 2% of briefs</td><td>One invented fact breaks trust</td><td>Weekly eval of 50 briefs against their snapshots</td></tr>
-        <tr><td><span class="tag guard">Guardrail</span> Brief latency · cost</td><td class="tgt">p95 &lt; 6 s · &lt; ₹1</td><td>Daily use at pilot scale</td><td>n8n execution logs and Gemini token usage</td></tr>
+        <tr><td><span class="tag guard">Guardrail</span> Brief latency · cost</td><td class="tgt">p95 &lt; 6 s · &lt; ₹1</td><td>Daily use at pilot scale</td><td>Vercel function logs and Gemini token usage</td></tr>
       </tbody>
     </table>
   </div>
@@ -162,22 +162,22 @@
       <div class="card wash">
         <h3>In scope (built and working in the demo)</h3>
         <ul class="chk small cols2">
-          <li>Four sources: Slack, Jira, GitHub, Gmail (realistic mock data, n8n ingestion)</li>
+          <li>Four sources: Slack, Jira, GitHub, Gmail (realistic mock data shaped like each API)</li>
           <li>Today dashboard: radar, AI brief, needs attention, who’s blocked</li>
           <li>Priority feed with an explainable 0–100 score and three rings</li>
           <li>Item detail, plain-language search, ⌘K palette, Team view</li>
           <li>Assign (AI-suggested owner), Mark done, Snooze, Undo</li>
-          <li>Gemini brief via n8n or a serverless route, with on-device fallback</li>
+          <li>Live Gemini brief through a serverless route, with on-device fallback</li>
           <li>Empty, error and outage states; dark mode; mobile layout</li>
-          <li>Settings: AI engine, n8n webhooks, live ranking weights</li>
+          <li>Settings: AI engine, live ranking weights, outage simulation</li>
         </ul>
       </div>
       <div class="card">
         <h3>Out of scope (v1)</h3>
         <ul class="chk out small">
-          <li>Live OAuth and write-back to source tools (actions logged to n8n)</li>
+          <li>Live OAuth connectors and write-back to source tools</li>
           <li>Director roll-ups; weights learned from behaviour</li>
-          <li>Alerts beyond the morning Slack brief</li>
+          <li>Push digests and alerts (Slack, email)</li>
           <li>Teams, Outlook, Linear, Notion; admin and SSO</li>
         </ul>
       </div>
@@ -187,12 +187,12 @@
     <div>
       <h2><span class="n">08</span>Assumptions</h2>
       <ol class="small cols2" style="padding-left:4.2mm">
-        <li><strong>Explainable beats clever.</strong> Managers will trust a deterministic score they can inspect and re-weight more than an opaque AI ranking. AI writes and triages; it doesn’t rank.</li>
+        <li><strong>Explainable beats clever.</strong> Managers will trust a deterministic score they can inspect and re-weight more than an opaque AI ranking. AI writes the brief; it doesn’t rank.</li>
         <li><strong>Read-only access is acceptable.</strong> Airtribe security will approve least-privilege OAuth scopes if message bodies are kept no longer than 7 days and never used for training.</li>
-        <li><strong>The push builds the habit.</strong> A short Slack brief at 08:45 brings managers in daily better than a dashboard alone.</li>
+        <li><strong>A fast start page builds the habit.</strong> If the brief is ready in seconds, managers will open WorkRadar first each morning. A Slack or email digest is the next lever if they don’t.</li>
         <li><strong>Time is the strongest signal.</strong> Deadline proximity, who is waiting and what is blocked predict “needs me today” better than labels.</li>
         <li><strong>The volume estimates hold.</strong> To validate with 5 manager interviews and a 2-week diary study before the pilot.</li>
-        <li><strong>Cost is negligible.</strong> Gemini Flash-class models and self-hosted n8n keep a brief under ₹1 and pilot running costs near zero.</li>
+        <li><strong>Cost is negligible.</strong> Gemini Flash-Lite on Vercel’s free tier keeps a brief under ₹1 and pilot running costs near zero.</li>
       </ol>
     </div>
   </div>
@@ -210,7 +210,7 @@
           <li><b>Natural-language search</b> (“blocked prs waiting on me”) and ⌘K.</li>
           <li><b>One-click actions</b>: Assign (AI-suggested owner), Done, Snooze, Undo.</li>
           <li><b>Team blockers</b>, sorted by who needs the manager first.</li>
-          <li><b>Graceful degradation</b>: n8n → Gemini → on-device; outage banner.</li>
+          <li><b>Graceful degradation</b>: Flash-Lite → Flash → on-device, with the reason shown; outage banner.</li>
         </ul>
       </div>
       <div class="card">
@@ -223,7 +223,8 @@
           <li><b>1:1 prep and weekly digest</b> for each report: shipped, stuck, waiting.</li>
           <li><b>Director roll-ups</b> across teams, with launch risk heatmaps.</li>
           <li><b>More sources</b>: Linear, Notion, Teams, Outlook, PagerDuty.</li>
-          <li><b>Quiet hours and personal SLAs</b> (“reply to leadership within 4h”).</li>
+          <li><b>AI triage of live threads</b>: priority, owner and next step for Slack and email.</li>
+          <li><b>Morning digest</b> in Slack or email, with quiet hours.</li>
         </ul>
       </div>
     </div>
@@ -234,7 +235,7 @@
     <strong>Top risks</strong><span>Over-trusting the AI (mitigated by explainable scores, labelled engines and undo) · Privacy of message content (read-only scopes, short retention) · Ranking drift as teams change (adjustable weights, weekly trust pulse).</span>
   </div>
 
-  <div class="foot"><span>Source, n8n workflows and docs: <a href="https://github.com/adityasingh535402-del/WorkRadar">github.com/adityasingh535402-del/WorkRadar</a> · Designs: <a href="https://www.figma.com/design/Q8RHXzIj6yOqBR4HDq5hn5">figma.com/design/Q8RHXzIj6yOqBR4HDq5hn5</a></span><span>2 / 2</span></div>
+  <div class="foot"><span>Live app: <a href="https://work-radar-ten.vercel.app">work-radar-ten.vercel.app</a> · Source: <a href="https://github.com/adityasingh535402-del/WorkRadar">github.com/adityasingh535402-del/WorkRadar</a> · Designs: <a href="https://www.figma.com/design/Q8RHXzIj6yOqBR4HDq5hn5">figma.com/design/Q8RHXzIj6yOqBR4HDq5hn5</a></span><span>2 / 2</span></div>
 </section>
 </body>
 </html>

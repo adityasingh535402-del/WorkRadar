@@ -5,7 +5,7 @@ import { due, partOfDay, since } from './time';
 
 const DAY = 24 * 60 * 60_000;
 
-/** Short, AI-ready description of the workload. Same shape is sent to n8n and the serverless route. */
+/** Short, AI-ready description of the workload, sent to the serverless /api/digest route. */
 export function buildPayload(ranked: Scored[], all: WorkItem[], now: number) {
   const me = person(ME)!;
   const blocked = blockedPeople(all);

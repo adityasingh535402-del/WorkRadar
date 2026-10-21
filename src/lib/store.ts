@@ -17,8 +17,8 @@ export interface Toast {
 export type BriefState =
   | { status: 'idle' }
   | { status: 'loading'; previous?: Brief }
-  | { status: 'ready'; data: Brief; note?: string }
-  | { status: 'error'; message: string; previous?: Brief };
+  /** note: a quiet explanation; degraded: Gemini failed and this is the on-device fallback. */
+  | { status: 'ready'; data: Brief; note?: string; degraded?: string };
 
 export interface State {
   now: number;
@@ -36,8 +36,6 @@ export interface State {
 export const DEFAULT_SETTINGS: Settings = {
   weights: { ...DEFAULT_WEIGHTS },
   aiMode: 'auto',
-  n8nDigestUrl: '',
-  n8nActionUrl: '',
   theme: 'system',
   outage: null,
 };
@@ -74,7 +72,12 @@ let state: State = {
   now: boot,
   base: buildItems(boot),
   overrides: persisted.overrides ?? {},
-  settings: { ...DEFAULT_SETTINGS, ...persisted.settings, weights: { ...DEFAULT_WEIGHTS, ...persisted.settings?.weights } },
+  settings: {
+    weights: { ...DEFAULT_WEIGHTS, ...persisted.settings?.weights },
+    aiMode: persisted.settings?.aiMode === 'local' ? 'local' : 'auto',
+    theme: persisted.settings?.theme ?? DEFAULT_SETTINGS.theme,
+    outage: persisted.settings?.outage ?? null,
+  },
   demo: persisted.demo ?? 'live',
   brief: { status: 'idle' },
   toasts: [],
@@ -173,7 +176,7 @@ export function dismissToast(id: number) {
 type ActionKind = 'assign' | 'done' | 'reopen' | 'snooze' | 'unsnooze';
 type ActionListener = (a: { kind: ActionKind; item: WorkItem; assignee?: string; until?: string }) => Promise<string | null>;
 let actionListener: ActionListener | null = null;
-/** The AI/automation layer registers here so actions can be synced to n8n. */
+/** A sync layer can register here to push actions to the source tools (not used in the demo). */
 export function onAction(l: ActionListener) {
   actionListener = l;
 }

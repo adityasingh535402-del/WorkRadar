@@ -158,7 +158,7 @@ export interface Scored {
   why: string;
 }
 
-export type Engine = 'n8n' | 'gemini' | 'local';
+export type Engine = 'gemini' | 'local';
 
 export interface Brief {
   generatedAt: string;
@@ -171,13 +171,11 @@ export interface Brief {
   blocked: { personId: string; itemId?: string; blockedOn: string; since?: string; suggestion: string }[];
 }
 
-export type AiMode = 'auto' | 'n8n' | 'local';
+export type AiMode = 'auto' | 'local';
 
 export interface Settings {
   weights: Weights;
   aiMode: AiMode;
-  n8nDigestUrl: string;
-  n8nActionUrl: string;
   theme: 'system' | 'light' | 'dark';
   outage: Source | null;
 }

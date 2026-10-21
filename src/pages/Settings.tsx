@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import type { AiMode, FactorKey, Source } from '../lib/types';
 import { DEFAULT_WEIGHTS, FACTOR_LABELS } from '../lib/scoring';
-import { rankedOpen, resetDemo, setDemo, toast, updateSettings, useStore } from '../lib/store';
-import { generateBrief, testWebhook } from '../lib/ai';
+import { rankedOpen, resetDemo, setDemo, updateSettings, useStore } from '../lib/store';
+import { generateBrief } from '../lib/ai';
 import { type Route } from '../lib/router';
 import { ago } from '../lib/time';
 import { ScoreBadge, SOURCE_META, SourceGlyph } from '../components/bits';
@@ -10,40 +10,19 @@ import { Icon } from '../components/Icon';
 import { PageHeader } from '../components/Layout';
 
 const MODES: { id: AiMode; label: string; text: string }[] = [
-  { id: 'auto', label: 'Automatic', text: 'Use n8n if a webhook is set, then the hosted Gemini route, then the on-device summary. The brief never comes up empty.' },
-  { id: 'n8n', label: 'n8n only', text: 'Always use your n8n workflow. Shows an error if n8n isn’t reachable, which is useful when testing the workflow.' },
+  { id: 'auto', label: 'Gemini', text: 'Gemini writes the brief through WorkRadar’s server, so the API key never reaches the browser. If Gemini doesn’t answer, you get the on-device summary and a note saying why.' },
   { id: 'local', label: 'On-device', text: 'Rule-based summary computed in the browser. No data leaves the page.' },
 ];
 
 export function Settings({ route }: { route: Route }) {
   const state = useStore((s) => s);
   const { settings } = state;
-  const [digestUrl, setDigestUrl] = useState(settings.n8nDigestUrl);
-  const [actionUrl, setActionUrl] = useState(settings.n8nActionUrl);
-  const [test, setTest] = useState<{ status: 'idle' | 'running' | 'ok' | 'fail'; text?: string }>({ status: 'idle' });
   const top = rankedOpen(state).slice(0, 5);
 
   useEffect(() => {
     const section = route.query.get('section');
     if (section) document.getElementById(section)?.scrollIntoView({ block: 'start' });
   }, [route.query]);
-
-  const saveUrls = () => {
-    updateSettings({ n8nDigestUrl: digestUrl.trim(), n8nActionUrl: actionUrl.trim() });
-    toast({ text: 'n8n settings saved' });
-    generateBrief({ force: true });
-  };
-
-  const runTest = async () => {
-    if (!digestUrl.trim()) return;
-    setTest({ status: 'running' });
-    try {
-      const r = await testWebhook(digestUrl.trim());
-      setTest(r.ok ? { status: 'ok', text: `Connected. The workflow answered in ${(r.ms / 1000).toFixed(1)} s${r.model ? ` using ${r.model}` : ''}.` } : { status: 'fail', text: 'n8n answered, but the response wasn’t a WorkRadar brief. Check the “Respond to Webhook” node.' });
-    } catch (e) {
-      setTest({ status: 'fail', text: `Couldn’t reach the webhook: ${(e as Error).message} Check that n8n is running, the workflow is active, and the URL is the Production URL.` });
-    }
-  };
 
   const keys = Object.keys(DEFAULT_WEIGHTS) as FactorKey[];
   const sources: Source[] = ['slack', 'jira', 'github', 'email'];
@@ -73,32 +52,6 @@ export function Settings({ route }: { route: Route }) {
           ))}
         </div>
 
-        <div className="field">
-          <label htmlFor="digest">n8n digest webhook</label>
-          <p className="field-help">The Production URL of the “WorkRadar · Daily digest” workflow, for example https://your-tunnel.trycloudflare.com/webhook/workradar/digest</p>
-          <div className="field-row">
-            <input id="digest" type="url" value={digestUrl} onChange={(e) => setDigestUrl(e.target.value)} placeholder="https://…/webhook/workradar/digest" spellCheck={false} />
-            <button className="btn" onClick={runTest} disabled={!digestUrl.trim() || test.status === 'running'}>
-              {test.status === 'running' ? 'Testing…' : 'Test'}
-            </button>
-          </div>
-          {test.text && (
-            <p className={`field-result ${test.status === 'ok' ? 'is-ok' : 'is-fail'}`} role="status">
-              <Icon name={test.status === 'ok' ? 'check-circle' : 'alert'} size={15} />
-              {test.text}
-            </p>
-          )}
-        </div>
-        <div className="field">
-          <label htmlFor="actions">n8n actions webhook</label>
-          <p className="field-help">Optional. Assign, Mark done and Snooze are sent here so n8n can update Jira, GitHub or Slack.</p>
-          <input id="actions" type="url" value={actionUrl} onChange={(e) => setActionUrl(e.target.value)} placeholder="https://…/webhook/workradar/action" spellCheck={false} />
-        </div>
-        <div className="field-actions">
-          <button className="btn btn-primary" onClick={saveUrls}>
-            Save n8n settings
-          </button>
-        </div>
       </section>
 
       <section className="panel settings-section" id="weights" aria-labelledby="w-title">
@@ -140,7 +93,7 @@ export function Settings({ route }: { route: Route }) {
 
       <section className="panel settings-section" id="sources" aria-labelledby="src-title">
         <h2 id="src-title">Sources</h2>
-        <p className="field-help">This demo uses mock data shaped like each tool’s API. In production, n8n’s ingestion workflow pulls these on a schedule.</p>
+        <p className="field-help">This demo uses mock data shaped like each tool’s API. In production, WorkRadar would pull these on a schedule with read-only access.</p>
         <ul className="source-settings">
           {sources.map((s) => {
             const down = settings.outage === s;

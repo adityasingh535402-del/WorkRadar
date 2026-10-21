@@ -4,10 +4,10 @@ The video should cover five things: problem understanding, product decisions, th
 
 ## Before recording
 
-- Open the deployed app (or the preview) at 1440 × 900, browser zoom 100%, light theme.
+- Open the live app, https://work-radar-ten.vercel.app, at 1440 × 900, browser zoom 100%, light theme.
 - Go to **Settings → Reset demo data → Reset** so every count matches this script.
-- If n8n is running: in Settings set the AI engine to **Automatic**, check the brief says **Gemini via n8n**, and open the n8n editor in a second tab.
-- Have these ready in tabs: the PRD PDF (page 1), the Figma file, and the GitHub repo.
+- Check the brief on Today says **Gemini**. If you open the page more than 30 minutes before recording, click **Regenerate** once so the brief is fresh.
+- Have these ready in tabs: the PRD PDF (page 1), the Figma file, `api/_prompt.ts` on GitHub, and the AI Workflow PDF (page 2).
 
 ---
 
@@ -25,8 +25,8 @@ The video should cover five things: problem understanding, product decisions, th
 
 > Three decisions shaped the product.
 > First, the ranking is not a black box. Every item gets a 0 to 100 score from six signals you can see and adjust.
-> Second, AI does what it's good at, which is language. Gemini writes the brief and reads messy Slack threads and emails. It doesn't decide the order.
-> Third, it never comes up empty. If n8n is down it falls back to a serverless Gemini call, and if that fails, to an on-device summary. It always tells you which one wrote the brief.
+> Second, AI does what it's good at, which is language. Gemini turns the ranking into a brief a manager can act on. It doesn't decide the order.
+> Third, it never comes up empty. If Gemini fails, you get an on-device summary of the same data and a plain note saying why. The label always tells you which one wrote the brief.
 
 ## 3. Live app · 1:05–2:55
 
@@ -56,17 +56,21 @@ The video should cover five things: problem understanding, product decisions, th
 
 ## 4. The AI workflow · 2:55–4:05
 
-**Show:** the n8n editor, with the **Source ingestion** workflow open.
+**Show:** the AI Workflow PDF, page 2: the diagram *Where AI runs inside the product*.
 
-> Behind the app are four n8n workflows. Every 15 minutes, ingestion pulls Slack, Jira, GitHub and Gmail and normalises them into one shape. It sends only the unstructured threads to Gemini for triage, then scores and ranks everything.
+> Here's how the brief is made. The app ranks everything first, with plain code. Then it sends a small snapshot to one serverless route on Vercel: the top 24 items, who's blocked and the last 24 hours. The route calls Gemini, and the API key never leaves the server.
 
-**Show:** the **Daily digest** workflow, then `api/_prompt.ts` on GitHub.
+**Show:** `api/_prompt.ts` on GitHub, scrolling slowly through the rules and the schema.
 
-> The daily digest sends Gemini the ranked snapshot with a strict prompt and a JSON schema. It must use only facts from the snapshot and must cite exact item IDs. A validation step drops anything it can't verify, which makes hallucinations detectable rather than invisible. The same prompt powers the Vercel fallback, so the two engines can't drift.
+> The prompt is strict. Use only facts from the snapshot, and cite the exact ID of every item. The answer has to match a JSON schema, and WorkRadar checks it: if Gemini mentions an item that doesn't exist, it's dropped. So a hallucination is caught automatically instead of reaching the screen.
 
-**Show:** the **Item actions** and **Morning brief** workflows, then the Figma file.
+**Show:** back on Today, click **Regenerate** and let the brief reload. It takes about 2 seconds.
 
-> Assign, Done and Snooze post back to n8n, and at 8:45 every weekday a short brief lands in Slack. I built the whole product with Claude as my AI partner, from the PRD to the code to these workflows. Even the Figma file was generated from the running app, so the design and the product never drift. The AI Workflow document lists every prompt, what AI generated, what we changed after review, and the trade-offs.
+> One decision came from measuring rather than guessing. The bigger Gemini Flash model took over 35 seconds on the live site. Flash-Lite does the same job in about 2, so it's the default and Flash is the backup.
+
+**Show:** the Figma file, then the AI Workflow PDF, page 3: *What AI generated, and what changed after review*.
+
+> I built the whole product with Claude as my AI partner, from the PRD to the code to the deployment. Even the Figma file was generated from the running app, so the design and the product never drift. The AI Workflow document lists the prompts, what AI generated, what I changed after review, and the trade-offs.
 
 ## 5. Success metrics and what's next · 4:05–4:45
 

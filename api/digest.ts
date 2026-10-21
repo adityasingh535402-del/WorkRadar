@@ -2,9 +2,8 @@ import { DEFAULT_MODEL, FALLBACK_MODEL, RESPONSE_SCHEMA, SYSTEM_PROMPT } from '.
 
 /**
  * POST /api/digest
- * Generates the AI brief. Uses the n8n "Daily digest" workflow when N8N_DIGEST_URL
- * is set, otherwise calls Gemini directly with GEMINI_API_KEY. The browser never
- * sees either secret.
+ * Generates the AI brief with Gemini. The key (GEMINI_API_KEY) stays on the server;
+ * the browser only ever talks to this route.
  */
 export const config = { runtime: 'edge' };
 
@@ -39,38 +38,20 @@ async function callGemini(payload: unknown, key: string, model: string, timeoutM
   return JSON.parse(text) as Record<string, unknown>;
 }
 
-type Result = { brief?: Record<string, unknown>; engine?: 'n8n' | 'gemini'; model?: string | null; error?: string; note?: string };
+type Result = { brief?: Record<string, unknown>; engine?: 'gemini'; model?: string; error?: string; note?: string };
 
-/** Tries n8n (when configured), then Gemini Flash, then Gemini Flash-Lite. Never throws. */
-async function produce(raw: string, payload: unknown): Promise<Result> {
+/** Tries the configured model, then the fallback model. Never throws. */
+async function produce(payload: unknown): Promise<Result> {
   const problems: string[] = [];
-
-  // 1. Prefer the n8n workflow when one is configured.
-  const n8n = process.env.N8N_DIGEST_URL;
-  if (n8n) {
-    try {
-      const r = await fetch(n8n, { method: 'POST', headers: { 'content-type': 'application/json' }, body: raw, signal: AbortSignal.timeout(45_000) });
-      console.log(`[digest] n8n answered ${r.status}`);
-      if (r.ok) {
-        const data = (await r.json()) as Record<string, unknown> | Record<string, unknown>[];
-        const first = Array.isArray(data) ? data[0] : data;
-        return { brief: (first.brief ?? first) as Record<string, unknown>, engine: 'n8n', model: (first.model as string | undefined) ?? null };
-      }
-      problems.push(`n8n answered ${r.status}`);
-    } catch (e) {
-      problems.push(`n8n: ${(e as Error).message}`);
-    }
-  }
-
-  // 2. Call Gemini directly: the configured model first, then the lighter Flash-Lite.
+  // The configured model first, then the fallback model (separate free-tier quota).
   const key = process.env.GEMINI_API_KEY;
-  if (!key) return { error: 'No AI engine is configured. Set GEMINI_API_KEY (or N8N_DIGEST_URL) in the deployment.' };
+  if (!key) return { error: 'No AI engine is configured. Set GEMINI_API_KEY in the deployment.' };
   const primary = process.env.GEMINI_MODEL || DEFAULT_MODEL;
   const models = primary === FALLBACK_MODEL ? [primary] : [primary, FALLBACK_MODEL];
   for (const [i, model] of models.entries()) {
     const t0 = Date.now();
     try {
-      const brief = await callGemini(payload, key, model, i === 0 ? 35_000 : 30_000);
+      const brief = await callGemini(payload, key, model, i === 0 ? 30_000 : 75_000);
       console.log(`[digest] ${model} ok in ${Date.now() - t0} ms`);
       return { brief, engine: 'gemini', model, note: problems.length ? problems.join('; ') : undefined };
     } catch (e) {
@@ -106,7 +87,7 @@ export default async function handler(req: Request): Promise<Response> {
     async start(controller) {
       controller.enqueue(enc.encode(' '));
       const keepAlive = setInterval(() => controller.enqueue(enc.encode(' ')), 4000);
-      const result = await produce(raw, payload);
+      const result = await produce(payload);
       clearInterval(keepAlive);
       controller.enqueue(enc.encode(JSON.stringify(result)));
       controller.close();

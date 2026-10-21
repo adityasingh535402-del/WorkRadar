@@ -1,0 +1,30 @@
+{
+  "_comment": "A real brief returned by the live /api/digest route (gemini-3.5-flash-lite, 21 Oct 2026). capture.py serves it for the design screens; agoMin re-anchors 'happened' times to the capture moment.",
+  "model": "gemini-3.5-flash-lite",
+  "headline": "4 items need attention now and 1 person is blocked on you. Start by approving the video SDK rollback and reviewing Ananya's PR to unblock the grade sync.",
+  "topWork": [
+    { "itemId": "wr-101", "why": "Approve Arjun's canary rollback now before the live class starts in 5 hours." },
+    { "itemId": "wr-102", "why": "Review Ananya's grade sync fix PR so LP-498 can move forward." },
+    { "itemId": "wr-104", "why": "Reply to Rohan with a conditional go/no-go launch decision." }
+  ],
+  "happened": [
+    { "text": "Priya flagged that learners on iPhone can't join live sessions.", "itemId": "wr-101", "agoMin": 95 },
+    { "text": "v3.14.0 deployed to production.", "itemId": "wr-112", "agoMin": 120 },
+    { "text": "Rahul closed LP-510: Certificate generator v2.", "itemId": "wr-125", "agoMin": 130 },
+    { "text": "Ishita flagged that mentors haven't received session reminders since Friday.", "itemId": "wr-105", "agoMin": 150 },
+    { "text": "11 of 12 Launchpad mentors confirmed.", "itemId": "wr-144", "agoMin": 160 },
+    { "text": "Rohan flagged GenAI Launchpad go/no-go needed today.", "itemId": "wr-104", "agoMin": 180 }
+  ],
+  "attention": [
+    { "itemId": "wr-101", "why": "Live class starts in 5 hours and 320 learners are affected by the blank screen on mobile Safari.", "action": "Approve Arjun's canary rollback immediately." },
+    { "itemId": "wr-102", "why": "Mentor review window opens within a day and LP-498 is blocked pending this review.", "action": "Review PR #1284 now." },
+    { "itemId": "wr-103", "why": "Payment webhook failures gate today's GenAI Launchpad go/no-go decision in 4 hours.", "action": "Assign LP-512 to Arjun." },
+    { "itemId": "wr-104", "why": "Rohan needs your launch recommendation today with revenue at stake.", "action": "Reply to Rohan with a conditional go/no-go decision." }
+  ],
+  "blocked": [
+    { "personId": "meera", "itemId": "wr-107", "blockedOn": "Final landing page copy", "since": "2d", "suggestion": "Approve Meera's placeholder copy for launch or ask Marketing for a firm date." },
+    { "personId": "ananya", "itemId": "wr-106", "blockedOn": "Waiting on your review of PR #1284", "since": "26h", "suggestion": "Review PR #1284 to unblock Ananya." },
+    { "personId": "vikram", "itemId": "wr-109", "blockedOn": "Needs read-replica access from Arjun (LP-505)", "since": "24h", "suggestion": "Ask Arjun to complete LP-505 after the rollback." },
+    { "personId": "rahul", "itemId": "wr-110", "blockedOn": "Waiting for Karan's mentor slots API v2", "since": "7h", "suggestion": "Decide if Ananya can pick up LP-501 while Karan handles the incident." }
+  ]
+}

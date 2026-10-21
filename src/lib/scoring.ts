@@ -65,7 +65,8 @@ export function scoreItem(item: WorkItem, weights: Weights, now: number, blocks:
   {
     let v = item.priority ? PRIORITY_IMPACT[item.priority] : 0.4;
     const parts: string[] = [];
-    // Jira priorities are explicit; for Slack, GitHub and email the n8n ingestion step infers one.
+    // Jira priorities are explicit. For Slack, GitHub and email the priority is inferred from the
+    // message; in the demo data it is pre-set, in production an AI triage step would set it.
     if (item.priority) parts.push(item.source === 'jira' ? item.priority : `Inferred ${item.priority}`);
     const learners = item.signals.learners ?? 0;
     if (learners > 0) {

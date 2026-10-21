@@ -1,6 +1,5 @@
 /**
- * The WorkRadar brief prompt. The same text lives in the n8n "Daily digest"
- * workflow so both engines produce the same JSON shape.
+ * The WorkRadar brief prompt and response schema, used by the /api/digest route.
  */
 export const SYSTEM_PROMPT = `You are WorkRadar, a chief-of-staff assistant for an engineering manager.
 You receive a JSON snapshot of their team's work from Slack, Jira, GitHub and email.

@@ -15,5 +15,5 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run build
-      - name: Validate n8n workflow files
-        run: node n8n/validate.mjs
+      - name: Ranking, brief validation, search and API checks
+        run: npm test

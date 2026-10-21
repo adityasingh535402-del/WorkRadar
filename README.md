@@ -9,9 +9,11 @@ WorkRadar helps an engineering manager answer four questions in under a minute e
 3. What needs my attention right now?
 4. Who on my team is blocked?
 
+**Live app: [work-radar-ten.vercel.app](https://work-radar-ten.vercel.app)**
+
 Built by **Aditya Singh** as the capstone for the Airtribe AI Product Management program. The demo workspace is an Airtribe Learning Platform team, with mock data covering live sessions, AI-assisted assignment review, the GenAI Launchpad launch, Mentor Connect and the Career hub.
 
-> **Mock data.** All people, messages and tickets are fictional and generated relative to the current time, so the demo always reads as “today”. Backend integrations run in n8n demo mode; see [`n8n/`](n8n/).
+> **Mock data.** All people, messages and tickets are fictional and generated relative to the current time, so the demo always reads as “today”. The AI brief is real: Gemini writes it live from that data.
 
 ![WorkRadar Today dashboard](docs/screens/01-today.png)
 
@@ -24,9 +26,9 @@ Built by **Aditya Singh** as the capstone for the Airtribe AI Product Management
 | **Item detail** | AI summary and suggested next step, dependencies (blocked by / waiting on this), the source-specific detail (Slack thread, Jira fields, PR checks and reviewers, email), activity timeline, and *Why it’s on your radar* with the score broken down by factor. |
 | **Search** | Plain-language search that turns words into filters (“blocked prs waiting on me”, “ananya p1”, “launchpad”), with chips you can remove, tabs by source, and a ⌘K command palette everywhere. |
 | **Team** | Each person’s load, urgent items, what they shipped today and what they’re blocked on, sorted by who needs you first. |
-| **Settings** | AI engine (automatic, n8n only, on-device), n8n webhooks with a connection test, live ranking weights, simulated source outages, and an empty-workspace preview. |
-| **Actions** | Assign (with an AI-suggested owner), Mark done and Snooze everywhere, with undo. Actions sync to n8n when it’s connected. |
-| **States** | First-run empty workspace, empty views, no search results, source outage banner, AI error with retry and on-device fallback, 404. |
+| **Settings** | AI engine (Gemini or on-device), live ranking weights with a top-five preview, simulated source outages, and an empty-workspace preview. |
+| **Actions** | Assign (with an AI-suggested owner), Mark done and Snooze everywhere, with undo. |
+| **States** | First-run empty workspace, empty views, no search results, source outage banner, “Gemini didn’t respond” with retry and an on-device fallback, 404. |
 
 ## Design
 
@@ -42,47 +44,38 @@ Built by **Aditya Singh** as the capstone for the Airtribe AI Product Management
 
 ```mermaid
 flowchart LR
-  subgraph Sources
-    S[Slack] --- J[Jira] --- G[GitHub] --- E[Gmail]
-  end
-  Sources --> I["n8n · Source ingestion<br/>normalise + Gemini triage + rank"]
-  I -->|ranked snapshot| D["n8n · Daily digest<br/>Gemini brief, JSON schema, validation"]
-  App[WorkRadar web app] -->|POST snapshot| V["/api/digest (Vercel)"]
-  V -->|N8N_DIGEST_URL set| D
-  V -->|otherwise| Gm[Gemini API]
-  App -->|Assign / Done / Snooze| A["n8n · Item actions"]
-  D --> M["n8n · Morning brief to Slack"]
-  App -.no AI reachable.-> L[On-device summary]
+  D[(Work items<br/>Slack · Jira · GitHub · Gmail)] --> R["Ranking in the app<br/>6 weighted signals → 0–100"]
+  R -->|top 24 + blocked people + last 24h| V["/api/digest<br/>Vercel Edge Function"]
+  V --> F1["Gemini 3.5 Flash-Lite<br/>JSON schema"]
+  F1 -.fails.-> F2["Gemini 3.8 Flash"]
+  F1 --> S[Validation<br/>drops unknown IDs]
+  F2 --> S
+  S --> B[AI brief on Today]
+  V -.no answer.-> L[On-device summary<br/>with the reason shown]
 ```
 
 - **Ranking is deterministic and explainable.** Six weighted signals (urgency, impact, unblocks others, waiting on you, stuck, escalation) produce the score, and every item shows why. P0 incidents are pinned to the top. Weights are adjustable in Settings.
-- **AI writes and triages; it doesn’t rank.** Gemini writes the brief from the ranked snapshot and triages unstructured Slack and email threads (priority, waiting on you, blocked, next step). Output is constrained by a JSON schema and validated: unknown item IDs are dropped.
-- **It never comes up empty.** The app tries n8n, then the serverless Gemini route, then an on-device summary, and labels which engine wrote the brief.
+- **AI writes; it doesn’t rank.** Gemini turns the ranked snapshot into the brief: headline, top three for today, what happened, needs attention, and who’s blocked with a suggested unblock. Output is constrained by a JSON schema and validated, so any item ID the model invents is dropped.
+- **Fast by default.** Flash-Lite answers in about 2 seconds. Flash, which reasons more but took over 35 seconds in testing, is the fallback. The route streams its response, so a slow model never hits the platform’s time limit.
+- **It never comes up empty.** If Gemini fails, the app shows an on-device summary of the same data, says why, and offers a retry. The brief is always labelled with the engine that wrote it.
 
 ## Run it locally
 
 ```bash
 npm install
-npm run dev          # http://localhost:5173
+npm run dev          # http://localhost:5173 (on-device summary; the AI route runs on Vercel)
 npm run build        # production build in dist/
 npm run typecheck
-node n8n/validate.mjs
+npm test             # ranking, brief validation, search and API checks
 ```
-
-Without any keys the app runs fully on its built-in data with the on-device summary.
 
 ## Deploy (free) on Vercel with real AI summaries
 
-1. Sign in to [vercel.com](https://vercel.com) with GitHub and **Add New → Project → Import** this repository. Vercel detects Vite automatically.
-2. In **Environment Variables** add `GEMINI_API_KEY` (from [Google AI Studio](https://aistudio.google.com/apikey)).
-   Optional: `GEMINI_MODEL`, `N8N_DIGEST_URL`, `N8N_ACTION_URL`. See [`.env.example`](.env.example).
+1. Sign in to [vercel.com](https://vercel.com) with GitHub, then **Add New → Project → Import** this repository. Vercel detects Vite automatically.
+2. In **Environment Variables**, add `GEMINI_API_KEY` (from [Google AI Studio](https://aistudio.google.com/apikey)). Optionally add `GEMINI_MODEL`; see [`.env.example`](.env.example).
 3. **Deploy**. The brief on the Today page now says “Gemini” instead of “On-device summary”.
 
-The key stays on the server: the browser only talks to `/api/digest`, which rejects cross-origin calls and oversized payloads, and retries on `gemini-3.5-flash-lite` if the default model is rate-limited.
-
-## n8n
-
-Four n8n workflows run the AI layer: digest API, source ingestion & ranking, item actions, and a morning brief to Slack. They run on n8n Cloud (recommended, nothing to install) or self-hosted with Docker. See **[n8n/README.md](n8n/README.md)**.
+The key stays on the server. The browser only talks to `/api/digest`, which rejects cross-origin calls and payloads over 80 KB.
 
 ## Project structure
 
@@ -93,13 +86,13 @@ src/
   components/      radar scope, AI brief, strips, menus, layout, palette
   pages/           Today, Priority feed, Item detail, Search, Team, Settings
   styles/          design tokens and components (light and dark)
-api/               Vercel edge routes: /api/digest, /api/action, shared prompt
-n8n/               workflows, Code-node sources, mock source payloads, validator
-docs/              PRD, AI workflow document, screen exports
+api/               Vercel edge route /api/digest and the shared prompt + schema
+scripts/           checks (npm test) and the single-file build
+docs/              PRD, AI workflow document, demo script, screen exports
 design/            Figma plugin that rebuilds the hi-fi screens
 ```
 
-Stack: React 18, TypeScript, Vite, hand-written CSS (no UI framework), Vercel Edge Functions, n8n, Gemini. No runtime dependencies beyond React.
+Stack: React 18, TypeScript, Vite, hand-written CSS (no UI framework), Vercel Edge Functions, Gemini. No runtime dependencies beyond React.
 
 ## Documents
 

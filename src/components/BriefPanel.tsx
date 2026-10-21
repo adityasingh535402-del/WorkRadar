@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import type { Brief, WorkItem } from '../lib/types';
 import { allItems, updateSettings, useStore } from '../lib/store';
-import { engineName, generateBrief } from '../lib/ai';
+import { engineName, generateBrief, plainReason } from '../lib/ai';
 import { Link } from '../lib/router';
 import { clock, partOfDay } from '../lib/time';
 import { Icon } from './Icon';
@@ -46,12 +46,12 @@ export function BriefPanel() {
         </div>
       </header>
 
-      {brief.status === 'error' && (
+      {brief.status === 'ready' && brief.degraded && (
         <div className="brief-error" role="alert">
           <Icon name="alert" size={18} />
           <div>
-            <p className="brief-error-title">The brief couldn’t be generated</p>
-            <p>{brief.message}</p>
+            <p className="brief-error-title">Gemini didn’t respond</p>
+            <p title={brief.degraded}>{plainReason(brief.degraded)} Below is an on-device summary of the same data.</p>
             <div className="brief-error-actions">
               <button className="btn btn-sm" onClick={() => generateBrief({ force: true })}>
                 Try again
@@ -63,7 +63,7 @@ export function BriefPanel() {
                   generateBrief({ force: true });
                 }}
               >
-                Use the on-device summary
+                Stay on device
               </button>
             </div>
           </div>
