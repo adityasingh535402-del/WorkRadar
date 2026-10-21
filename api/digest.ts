@@ -50,6 +50,7 @@ async function produce(raw: string, payload: unknown): Promise<Result> {
   if (n8n) {
     try {
       const r = await fetch(n8n, { method: 'POST', headers: { 'content-type': 'application/json' }, body: raw, signal: AbortSignal.timeout(45_000) });
+      console.log(`[digest] n8n answered ${r.status}`);
       if (r.ok) {
         const data = (await r.json()) as Record<string, unknown> | Record<string, unknown>[];
         const first = Array.isArray(data) ? data[0] : data;
@@ -67,10 +68,13 @@ async function produce(raw: string, payload: unknown): Promise<Result> {
   const primary = process.env.GEMINI_MODEL || DEFAULT_MODEL;
   const models = primary === FALLBACK_MODEL ? [primary] : [primary, FALLBACK_MODEL];
   for (const [i, model] of models.entries()) {
+    const t0 = Date.now();
     try {
       const brief = await callGemini(payload, key, model, i === 0 ? 35_000 : 30_000);
+      console.log(`[digest] ${model} ok in ${Date.now() - t0} ms`);
       return { brief, engine: 'gemini', model, note: problems.length ? problems.join('; ') : undefined };
     } catch (e) {
+      console.log(`[digest] ${model} failed after ${Date.now() - t0} ms: ${(e as Error).message}`);
       problems.push(`${model}: ${(e as Error).message}`);
     }
   }
