@@ -41,7 +41,7 @@ export function BriefPanel() {
           {data && <span className="brief-time">{clock(new Date(data.generatedAt))}</span>}
           <button className="btn btn-quiet btn-sm" onClick={() => generateBrief({ force: true })} disabled={loading} aria-label="Regenerate brief">
             <Icon name="refresh" size={15} className={loading ? 'spin' : undefined} />
-            <span>{loading ? 'Reading…' : 'Regenerate'}</span>
+            <span>{loading ? (state.settings.aiMode === 'auto' ? 'Asking Gemini…' : 'Reading…') : 'Regenerate'}</span>
           </button>
         </div>
       </header>

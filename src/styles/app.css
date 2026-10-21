@@ -1096,7 +1096,7 @@ code {
   color: var(--ink-3);
 }
 .brief-body.is-stale {
-  opacity: 0.55;
+  opacity: 0.7;
 }
 .brief-cols {
   display: grid;

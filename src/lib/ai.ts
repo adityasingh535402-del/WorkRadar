@@ -84,10 +84,11 @@ export async function generateBrief(opts: { force?: boolean } = {}) {
     }
   }
 
-  setBrief({ status: 'loading', previous });
   const ranked = rankedOpen(s);
   const all = visibleItems(s);
   const payload = buildPayload(ranked, all, s.now);
+  // Show something useful at once: the on-device summary stands in until Gemini answers.
+  setBrief({ status: 'loading', previous: previous ?? localBrief(ranked, all, Date.now()) });
 
   if (s.settings.aiMode === 'local') {
     // A short pause so the regenerate action is visible.
@@ -97,7 +98,7 @@ export async function generateBrief(opts: { force?: boolean } = {}) {
   }
 
   try {
-    const data = await postJson(DIGEST_URL, payload, 120_000);
+    const data = await postJson(DIGEST_URL, payload, 75_000);
     const brief = (data.brief ?? data) as Record<string, unknown>;
     const clean = sanitizeBrief(brief, all, 'gemini', typeof data.model === 'string' ? data.model : undefined);
     if (!clean) throw new Error('The response was missing the brief fields WorkRadar expects.');

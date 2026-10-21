@@ -51,7 +51,7 @@ async function produce(payload: unknown): Promise<Result> {
   for (const [i, model] of models.entries()) {
     const t0 = Date.now();
     try {
-      const brief = await callGemini(payload, key, model, i === 0 ? 30_000 : 75_000);
+      const brief = await callGemini(payload, key, model, i === 0 ? 20_000 : 40_000);
       console.log(`[digest] ${model} ok in ${Date.now() - t0} ms`);
       return { brief, engine: 'gemini', model, note: problems.length ? problems.join('; ') : undefined };
     } catch (e) {
