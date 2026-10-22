@@ -46,9 +46,9 @@ The video should cover five things: problem understanding, product decisions, th
 
 > The priority feed has everything, grouped into "needs attention now", "worth a look today" and "can wait". It's built for the keyboard: j and k to move, e to finish, s to snooze.
 
-**Search and ⌘K (2:20)**: open **Search** and type `blocked prs waiting on me`. Then press `⌘K` and type `launch`.
+**Search and ⌘K (2:20)**: open **Search** and type `slack waiting on me` (it returns four items; `blocked prs waiting on me` parses but matches nothing in the demo data). Then press `⌘K` and type `launch`.
 
-> Search understands plain language. "Blocked PRs waiting on me" turns into filters I can remove. Command-K jumps to anything from anywhere.
+> Search understands plain language. "Slack waiting on me" turns into two filters I can remove. Command-K jumps to anything from anywhere.
 
 **Team and states (2:35)**: open **Team**. Then go to **Settings → Sources**, click **Simulate outage** on Jira, and return to Today to show the banner. Click **Restore** afterwards. Toggle dark mode, and optionally show a phone-width window.
 
